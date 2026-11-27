@@ -2,10 +2,4 @@ plugins {
     alias(libs.plugins.quicktube.kmp.library)
 }
 
-kotlin {
-    sourceSets.androidMain.dependencies {
-        implementation(project.dependencies.platform(libs.firebase.bom))
-        implementation(libs.firebase.analytics)
-        implementation(libs.firebase.crashlytics)
-    }
-}
+// No analytics or crash-reporting SDK dependencies in this privacy-focused fork.
