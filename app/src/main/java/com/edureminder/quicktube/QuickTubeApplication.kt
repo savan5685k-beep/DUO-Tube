@@ -7,8 +7,6 @@ import coil3.SingletonImageLoader
 import coil3.request.crossfade
 import coil3.video.VideoFrameDecoder
 import com.edureminder.quicktube.core.data.LibraryRepository
-import com.edureminder.quicktube.core.analytics.Analytics
-import com.edureminder.quicktube.core.analytics.analyticsModule
 import com.edureminder.quicktube.core.data.SettingsRepository
 import com.edureminder.quicktube.core.data.dataModule
 import com.edureminder.quicktube.core.extractor.NewPipeMediaExtractor
@@ -43,11 +41,6 @@ class QuickTubeApplication : Application(), SingletonImageLoader.Factory {
         }
         get<DownloadManager>().start()
         appScope.launch {
-            // Respect Settings → Privacy (crash reports + anonymous usage).
-            val analytics = get<Analytics>()
-            get<SettingsRepository>().settings.map { it.analyticsEnabled }.distinctUntilChanged().collect(analytics::setEnabled)
-        }
-        appScope.launch {
             val library = get<LibraryRepository>()
             library.purgeExpiredTrash()
             // Files already in the download folder (e.g. after a reinstall) show up in the library again.
@@ -63,14 +56,8 @@ class QuickTubeApplication : Application(), SingletonImageLoader.Factory {
         // Bulk downloads left unfinished when the app was closed carry on.
         appScope.launch { get<com.edureminder.quicktube.core.downloadsheet.BulkDownloader>() }
         appScope.launch {
-            // Unpack the site engine in the background, then refresh its site support every few days.
-            val ytdlp = get<YtDlpExtractor>()
-            ytdlp.init()
-            val prefs = getSharedPreferences("engine", MODE_PRIVATE)
-            // Daily check (cheap: a conditional request that returns 304 when nothing changed).
-            if (System.currentTimeMillis() - prefs.getLong("updated", 0) > 24L * 60 * 60 * 1000) {
-                ytdlp.update()?.let { prefs.edit().putLong("updated", System.currentTimeMillis()).putString("version", it).apply() }
-            }
+            // Initialize the bundled engine only. No automatic engine-update request.
+            get<YtDlpExtractor>().init()
         }
         appScope.launch {
             get<SettingsRepository>().settings.map { it.contentRegion }.distinctUntilChanged().collect { region ->
