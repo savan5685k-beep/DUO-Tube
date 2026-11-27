@@ -8,7 +8,7 @@ This fork removes Firebase Analytics and Crashlytics dependencies and uses a no-
 
 ## Automatic network activity
 
-Automatic app-update checks and automatic yt-dlp engine-update checks are disabled in this fork. App updates may still be checked manually from Settings, which contacts GitHub and exposes the device's IP address to GitHub.
+Automatic app-update checks, yt-dlp engine-update checks, and background channel polling are disabled in this fork. App updates may still be checked manually from Settings, which contacts GitHub and exposes the device's IP address to GitHub.
 
 ## Network needed for app features
 
