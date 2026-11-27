@@ -110,16 +110,8 @@ class YtDlpExtractor(private val context: Context) : UniversalExtractor {
      */
     override suspend fun extract(url: String, headers: Map<String, String>): ExtractedPage? = withContext(Dispatchers.IO) {
         if (!awaitReady()) return@withContext null
-        // Only while it has never been updated and hasn't just tried (GitHub may be unreachable).
-        if (prefs.getString("etag", null) == null && System.currentTimeMillis() - prefs.getLong(KEY_CHECKED, 0) > RETRY_UPDATE_AFTER_MS) {
-            withTimeoutOrNull(FIRST_UPDATE_WAIT_MS) { update() }
-        }
-        extractOnce(url, headers) ?: run {
-            if (System.currentTimeMillis() - prefs.getLong(KEY_CHECKED, 0) < RETRY_UPDATE_AFTER_MS) return@run null
-            Log.i(TAG, "Retrying with the latest yt-dlp")
-            withTimeoutOrNull(FIRST_UPDATE_WAIT_MS) { update() }
-            extractOnce(url, headers)
-        }
+        // Privacy-focused fork: no automatic engine update requests.
+        extractOnce(url, headers)
     }
 
     private fun extractOnce(url: String, headers: Map<String, String>): ExtractedPage? {
