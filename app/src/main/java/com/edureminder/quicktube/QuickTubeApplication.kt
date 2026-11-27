@@ -7,6 +7,7 @@ import coil3.SingletonImageLoader
 import coil3.request.crossfade
 import coil3.video.VideoFrameDecoder
 import com.edureminder.quicktube.core.data.LibraryRepository
+import com.edureminder.quicktube.core.analytics.analyticsModule
 import com.edureminder.quicktube.core.data.SettingsRepository
 import com.edureminder.quicktube.core.data.dataModule
 import com.edureminder.quicktube.core.extractor.NewPipeMediaExtractor
