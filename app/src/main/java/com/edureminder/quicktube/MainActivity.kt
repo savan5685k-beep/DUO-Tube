@@ -62,7 +62,6 @@ class MainActivity : ComponentActivity() {
             updates.consumeJustUpdated()?.let { v ->
                 android.widget.Toast.makeText(this, "QuickTube updated to $v", android.widget.Toast.LENGTH_SHORT).show()
             }
-            updates.checkOnLaunch(force = BuildConfig.UPDATE_URL_OVERRIDDEN)
         }
         if (savedInstanceState == null) pendingIntent = intent
         setContent {
