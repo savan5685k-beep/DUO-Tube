@@ -157,7 +157,7 @@ fun SettingsScreen(actions: SettingsActions) {
         item { GroupLabel("Privacy") }
         item {
             QtCard {
-                NavRow(QtIcons.Shield, "Data collection disabled", "This DUO build has no analytics or crash-reporting SDK.", tint = Green)
+                NavRow(QtIcons.Shield, "Data collection disabled", "This DUO build has no analytics or crash-reporting SDK.", tint = Green, onClick = {})
             }
         }
         // Moving to another phone: history, playlists, subscriptions, watch later and settings in one file.
