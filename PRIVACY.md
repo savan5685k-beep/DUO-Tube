@@ -1,19 +1,17 @@
-# Privacy
+# Privacy — DUO privacy-focused fork
 
-QuickTube has no accounts and no servers of its own. Your downloads, history, vault and settings stay on your device.
+DUO has no accounts and no server of its own. Downloads, history, vault, playlists and settings are stored on-device.
 
-## What the official releases collect
+## Data collection and telemetry
 
-Builds published on the [Releases page](https://github.com/devgalib/QuickTube/releases) include Google Firebase:
+This fork removes Firebase Analytics and Crashlytics dependencies and uses a no-op analytics implementation. It does not send analytics events, crash reports, screen-view events, search terms, titles, filenames, or country/device telemetry to an analytics provider.
 
-- **Crashlytics**: crash reports (stack trace, device model, Android version, app version) so we can fix crashes.
-- **Analytics**: anonymous usage counts, for example "a download started" (video or audio, HTTP or HLS) or "a screen was opened".
+## Automatic network activity
 
-We **never** send the URLs you visit or download, video titles, search terms, file names or anything you type. For downloads we count only the site's domain (for example "tiktok.com"), the country and a short reason code when one fails, so we can see which sites need fixing.
+Automatic app-update checks and automatic yt-dlp engine-update checks are disabled in this fork. App updates may still be checked manually from Settings, which contacts GitHub and exposes the device's IP address to GitHub.
 
-You can turn both off at any time in **Settings → Privacy**. Builds made from source without a Firebase configuration collect nothing.
+## Network needed for app features
 
-## Network requests
+When you actively browse, search, stream or download media, DUO must make requests to the websites and media hosts you choose. Those services receive ordinary network request information such as your IP address and the URL requested. This traffic is required for those online features and is not telemetry. Offline files can be played without these media requests.
 
-To work, the app talks directly to the sites you use (YouTube, the pages you open in the browser, the media servers they point to)
-and to GitHub to update the yt-dlp engine and to check for new app versions (this request only reveals your IP address to GitHub). These requests go from your device to those services; they are not routed through us.
+The app is not a network firewall: it cannot block all network traffic while still providing online search, browsing, streaming, and downloads. For fully offline use, do not use online features.
