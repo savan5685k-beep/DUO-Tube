@@ -157,10 +157,7 @@ fun SettingsScreen(actions: SettingsActions) {
         item { GroupLabel("Privacy") }
         item {
             QtCard {
-                SwitchRow(
-                    "Share crash reports & usage", "Anonymous: never URLs, titles, searches or files. See PRIVACY.md",
-                    s.analyticsEnabled, QtIcons.Shield,
-                ) { v -> vm.update { it.copy(analyticsEnabled = v) } }
+                NavRow(QtIcons.Shield, "Data collection disabled", "This DUO build has no analytics or crash-reporting SDK.", tint = Green)
             }
         }
         // Moving to another phone: history, playlists, subscriptions, watch later and settings in one file.
