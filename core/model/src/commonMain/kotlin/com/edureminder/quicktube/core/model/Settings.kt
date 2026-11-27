@@ -70,7 +70,7 @@ data class AppSettings(
     val showTrending: Boolean = false,
     val onboarded: Boolean = false,
     /** Crash reports + anonymous usage stats (official builds only). */
-    val analyticsEnabled: Boolean = true,
+    val analyticsEnabled: Boolean = false,
     /** How captions look in the players. */
     val captionStyle: CaptionStyle = CaptionStyle(),
 )
