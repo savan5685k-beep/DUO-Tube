@@ -371,7 +371,6 @@ internal class DownloadEngine(
                 "kind" to done.type.name.lowercase(), "protocol" to done.protocol.name.lowercase(),
                 "site" to (com.edureminder.quicktube.core.common.DownloadStats.site(done.pageUrl ?: done.url) ?: "unknown"),
                 "platform" to com.edureminder.quicktube.core.common.Urls.platformOf(done.pageUrl ?: done.url).name.lowercase(),
-                "country" to com.edureminder.quicktube.core.analytics.DeviceCountry.code(context),
             ))
         } catch (e: CancellationException) {
             throw e
@@ -389,7 +388,6 @@ internal class DownloadEngine(
                     "reason" to (if (e is HttpStatusException) "http_${e.code}" else com.edureminder.quicktube.core.common.DownloadStats.reason(e)),
                     "site" to (com.edureminder.quicktube.core.common.DownloadStats.site(failed?.pageUrl ?: failed?.url) ?: "unknown"),
                     "platform" to com.edureminder.quicktube.core.common.Urls.platformOf(failed?.pageUrl ?: failed?.url).name.lowercase(),
-                    "country" to com.edureminder.quicktube.core.analytics.DeviceCountry.code(context),
                 ))
             }
         } finally {
