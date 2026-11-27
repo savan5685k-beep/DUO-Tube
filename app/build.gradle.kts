@@ -5,13 +5,6 @@ plugins {
     alias(libs.plugins.kotlin.serialization)
 }
 
-// Firebase (Analytics + Crashlytics) is enabled only when google-services.json is present.
-// It is git-ignored: maintainers' release builds get it from a CI secret; forks build without it.
-if (file("google-services.json").exists()) {
-    pluginManager.apply(libs.plugins.google.services.get().pluginId)
-    pluginManager.apply(libs.plugins.firebase.crashlytics.get().pluginId)
-}
-
 // Release signing: CI passes RELEASE_* as environment variables; locally they come from local.properties.
 val localProps = Properties().apply {
     rootProject.file("local.properties").takeIf { it.exists() }?.inputStream()?.use(::load)
