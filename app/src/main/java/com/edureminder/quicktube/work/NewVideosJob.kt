@@ -86,16 +86,8 @@ class NewVideosJob : JobService() {
 
         /** Every ~6 hours on any network; cancelled when the setting is off or nothing is followed. */
         fun schedule(context: Context, on: Boolean) {
-            val js = context.getSystemService(JobScheduler::class.java) ?: return
-            if (!on) { js.cancel(ID); return }
-            if (js.getPendingJob(ID) != null) return
-            js.schedule(
-                JobInfo.Builder(ID, ComponentName(context, NewVideosJob::class.java))
-                    .setRequiredNetworkType(JobInfo.NETWORK_TYPE_ANY)
-                    .setPeriodic(6 * 60 * 60 * 1000L)
-                    .setPersisted(false)
-                    .build(),
-            )
+            // Privacy fork: never schedule background channel polling. Cancel any previously scheduled job.
+            context.getSystemService(JobScheduler::class.java)?.cancel(ID)
         }
     }
 }
