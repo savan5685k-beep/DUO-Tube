@@ -1,5 +1,6 @@
 package com.edureminder.quicktube.core.common
 
+import com.edureminder.quicktube.core.model.MediaItem
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
