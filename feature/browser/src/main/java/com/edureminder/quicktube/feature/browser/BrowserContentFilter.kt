@@ -3,7 +3,6 @@ package com.edureminder.quicktube.feature.browser
 import java.net.IDN
 import java.net.URI
 import java.net.URLDecoder
-import java.nio.charset.StandardCharsets
 
 /**
  * Conservative URL-level adult-content filter.
@@ -62,7 +61,7 @@ internal fun duoBlockedUrl(raw: String): Boolean {
     val termBlocked = (0..2).any {
         val matched = DUO_BLOCKED_TERMS.containsMatchIn(candidate)
         if (matched) return@any true
-        candidate = runCatching { URLDecoder.decode(candidate, StandardCharsets.UTF_8) }.getOrDefault(candidate)
+        candidate = runCatching { URLDecoder.decode(candidate, "UTF-8") }.getOrDefault(candidate)
         false
     }
     return hostBlocked || termBlocked
