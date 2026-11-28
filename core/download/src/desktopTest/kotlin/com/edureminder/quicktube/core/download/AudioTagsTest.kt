@@ -1,5 +1,7 @@
 package com.edureminder.quicktube.core.download
 
+import com.edureminder.quicktube.core.common.Branding
+
 import org.junit.Assert.assertArrayEquals
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
