@@ -44,15 +44,14 @@
 2. Open it and allow "Install unknown apps" for your browser when Android asks.
 3. Optional: check the file against the `.sha256` next to it.
 
-Releases are signed with the same key every time, so updates install over the previous version. After the first install,
-DUO tells you when a new version is out and can update itself (Settings → Check for updates).
+Releases are signed with the same key every time, so updates install over the previous version. DUO has no in-app updater or APK installer; get updates from the official release page and install them through Android's user-controlled install flow.
 
 ## Features
 
 | Area | What it does |
 |---|---|
-| **Download tab** | *Search*: search box, "download copied link" chip, quick sites. *YouTube*: regional trending feed (music, gaming, movies, podcasts, live mixed). *Music*: song and playlist rows. *More*: per-platform "How to download" guides. |
-| **Search** | Live suggestions, recent searches, hot searches, results with All / Videos / Playlist / Channels / Music filters, plus Google / TikTok / Facebook / Instagram web search. |
+| **Download tab** | *Search*: search box, "download copied link" chip, quick sites. *YouTube*: regional trending feed (music, gaming, movies, podcasts, live mixed). *Music*: song and playlist rows. *WhatsApp Saver*: dedicated media-saving entry. |
+| **Search** | Live suggestions, recent searches, hot searches, results with All / Videos / Playlist / Channels / Music filters, plus web-search filters. Quick suggestions are limited to YouTube, Instagram, and Facebook. |
 | **Video page** | Inline 720p player, Download button, play-in-background (audio only), About sheet (likes, share, watch later), comments, "Up next". Channel and playlist pages. |
 | **Playlists & channels** | **Download all**, or **Select** videos (with select all) and download them together, or download one by one. One quality for the batch (M4A / 360p / 720p / 1080p / best); each video gets its closest format, in the background. |
 | **Download sheet** | "Download video as" with Music (M4A / Opus) and Video (144p–4K) choices, plus a *More formats* page. Video-only streams are merged with audio on-device (no re-encoding). |
@@ -61,7 +60,6 @@ DUO tells you when a new version is out and can update itself (Settings → Chec
 | **Download engine** | Each file is split into 4 MB pieces fetched over up to 8 connections at once, and video and audio download together. Pieces are remembered, so pause, retry or even a killed app resume where they were. Merging runs in-process with Media3 on private storage (a 10-minute 720p video takes a few seconds). Formats are chosen by codec so they can always be saved (H.264 first, AV1 only on Android 14+, VP9 as WebM); if a site still serves one that can't, or a link expires, the page is re-extracted and the download carries on. Queue, Wi-Fi vs mobile task limits, speed limit, notifications. |
 | **Play tab** | Downloading card, downloaded list with filter (music / video / pictures), search, multi-select (share, vault, delete). Item menu: vault, play as audio, convert to audio, share, open with, rename, delete. Remembers playback position. |
 | **Player** | Speed, previous / next, seek, double-tap ±10 s, fullscreen landscape, "All videos" queue, Listen (audio-only) mode, shuffle / repeat, mini player, lock-screen and notification controls. |
-| **In-app updates** | New releases are announced inside the app with their release notes. One tap downloads, verifies (SHA-256 and the same signing key) and installs the update; Android asks once for the "install unknown apps" permission. |
 | **Settings** | Download path, max tasks, speed limit, mobile data, notification toggles, **Appearance** (System/Light/Dark, 7 accent palettes, pure-black AMOLED, Material You wallpaper colours on Android 12+), content region, feedback, share, about. |
 | **Tools** | Recycle bin (30-day recover), deleted download history with "Download again", WhatsApp status saver, PIN-locked Vault, storage clean, large files clean, app uninstaller. |
 
@@ -162,8 +160,7 @@ All changes go through pull requests to `main`; releases are published by the ma
 
 ## Privacy
 
-No accounts, no servers of our own. Official releases send crash reports and anonymous usage counts through Firebase, and you can
-turn that off in Settings → Privacy. Details in [PRIVACY.md](PRIVACY.md).
+No accounts, no servers of our own. DUO does not send analytics events or crash reports. Online services you use receive their normal network requests; Android's speech-recognition provider may process voice input. Details in [PRIVACY.md](PRIVACY.md).
 
 ## Credits
 

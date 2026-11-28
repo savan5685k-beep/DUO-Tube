@@ -1,8 +1,7 @@
 package com.edureminder.quicktube.core.analytics
 
 /**
- * Product analytics and crash reporting, kept behind an interface so features never touch a vendor SDK.
- * Only coarse, non-identifying events are sent: never URLs, site names, titles, search terms or file names.
+ * Analytics hooks are compatibility-only; this privacy fork sends no telemetry.
  */
 interface Analytics {
     fun screen(name: String)
@@ -27,7 +26,7 @@ object Events {
     const val THEME_CHANGED = "theme_changed"
 }
 
-/** Used when Firebase isn't configured (e.g. a contributor's fork without google-services.json). */
+/** Always-no-op telemetry implementation for the privacy-focused DUO fork. */
 object NoOpAnalytics : Analytics {
     override fun screen(name: String) = Unit
     override fun event(name: String, params: Map<String, Any?>) = Unit
@@ -35,5 +34,5 @@ object NoOpAnalytics : Analytics {
     override fun setEnabled(enabled: Boolean) = Unit
 }
 
-/** Binds [Analytics]: Firebase on Android (official builds), nothing on desktop. */
+/** Platform binding: no-op on Android and desktop. */
 expect val analyticsModule: org.koin.core.module.Module

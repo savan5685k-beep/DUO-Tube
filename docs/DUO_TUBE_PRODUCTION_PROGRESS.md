@@ -2,7 +2,14 @@
 
 Updated: 2026-11-28
 
-## Latest iteration
+## Latest iteration (games/Remote Config removal)
+
+- Removed Android Firebase Remote Config games fetch, desktop Firebase REST fetch, cached games data/model, games screens and openers, and their test/template docs.
+- Removed Firebase Remote Config dependencies from `core:data`, the unused Google Services/Crashlytics plugin aliases, and desktop build-time generation of Firebase client config.
+- Updated README and privacy docs: no in-app updater/APK installer, no analytics/crash telemetry, quick suggestions are only YouTube/Instagram/Facebook; voice-recognition provider disclosure added.
+- **Validation pending for this new commit.** Previous main `d1e044809970ce9f763544403bf71f0e9b6c199d` has successful CI and APK build (run 46131065044 and 46131065119). The QA artifact SHA-256 is `a04fd84fdee03e270cacd73bcc4cf84ae53aa2ef9b118570f05cfd7db0e74b2e`; it contains arm64, armeabi-v7a, and universal debug APKs.
+
+## Earlier iteration
 
 ### Changes committed
 
@@ -48,6 +55,6 @@ Updated: 2026-11-28
 - Android voice recognition uses the device/system speech service; that provider may process audio off-device. DUO itself does not record or upload voice audio.
 - URL/domain filtering cannot guarantee classification of explicit image/video content hosted on allowed sites.
 - `usesCleartextTraffic=true` remains under review because the browser/downloader may intentionally support HTTP.
-- Firebase Remote Config games repository/dependency remains in source although the games route/UI was removed; audit and remove its unused outbound fetch path in a later iteration.
+- Verify that Remote Config/game-fetch code and Firebase dependencies are absent from the current tree and CI output.
 - Exported MediaSession service is intentional for external media controls; controller access policy remains under review.
 - Production readiness is not declared.

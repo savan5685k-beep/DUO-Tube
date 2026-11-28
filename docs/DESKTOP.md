@@ -46,7 +46,7 @@ core/extractor (NewPipe), data, downloadsheet          commonMain
 core/download     DownloadManager interface in commonMain; androidMain = the Android engine (service, Media3);
                   desktopMain = DesktopDownloadEngine (4 MB ranged parallel HTTP, ffmpeg for merge/convert/HLS/cuts)
 core/ytdlp        androidMain = bundled Python yt-dlp; desktopMain = official standalone yt-dlp binary
-core/analytics    androidMain = Firebase; desktopMain = no analytics
+core/analytics    androidMain = no-op; desktopMain = no-op.
 feature/home, feature/search                           commonMain (the same screens on both)
 feature/video, library, player, settings, browser, tools, gallery, core/media, core/playerui
                   Android only (Media3, WebView, MediaStore…); the desktop app has its own video page, library,

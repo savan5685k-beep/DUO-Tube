@@ -111,17 +111,6 @@ interface SavedVideosRepository {
     suspend fun remove(urls: List<String>)
 }
 
-/**
- * Our games for the home screen. Loaded from the copy saved at the last refresh, so they show at once; refreshed from
- * Remote Config at most once per refresh interval (24 h, set by `qt_games_refresh_hours`). The order rotates on every
- * app visit, so each game gets the first place in turn.
- */
-interface GamesRepository {
-    val games: StateFlow<com.edureminder.quicktube.core.model.PromoGames>
-    /** Fetches from Remote Config when the last refresh is older than the interval; otherwise does nothing. */
-    fun refreshIfDue()
-}
-
 /** Photos and videos on the device (MediaStore). Loaded in pages, kept fresh by a content observer. */
 interface GalleryRepository {
     /** Null until the first page has loaded; afterwards grows page by page until [GalleryLibrary.complete]. */

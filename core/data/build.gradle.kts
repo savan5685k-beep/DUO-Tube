@@ -13,12 +13,6 @@ kotlin {
         implementation(projects.core.extractor)
         implementation(libs.kotlinx.serialization.json)
     }
-    sourceSets.androidMain.dependencies {
-        implementation(libs.androidx.core.ktx)
-        // Our games on the home screen come from Remote Config (works without it: built-in list, see docs/PROMO_GAMES.md).
-        implementation(project.dependencies.platform(libs.firebase.bom))
-        implementation(libs.firebase.config)
-    }
     sourceSets.desktopMain.dependencies {
         implementation(libs.okhttp)
     }

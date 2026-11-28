@@ -24,5 +24,4 @@ internal actual val platformDataModule: org.koin.core.module.Module = module {
         })
     }
     single<GalleryRepository> { MediaStoreGalleryRepository(androidContext()) }
-    single<GamesRepository> { RemoteConfigGamesRepository(androidContext()) }
 }
