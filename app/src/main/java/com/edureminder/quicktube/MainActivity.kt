@@ -65,12 +65,9 @@ class MainActivity : ComponentActivity() {
     private val updates: UpdateManager by inject()
     private var pendingIntent by mutableStateOf<Intent?>(null)
 
-    private val permissionLauncher = registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) {}
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
-        requestStartupPermissions()
         player.connect()
         // Look for a new GitHub release (throttled; release builds only unless the URL was overridden for testing).
         if (savedInstanceState == null) {
@@ -160,12 +157,6 @@ class MainActivity : ComponentActivity() {
         // Shared text or the share popup's fallback means "download this"; a tapped YouTube link just opens it.
         val pasted = intent.action == Intent.ACTION_SEND || intent.getBooleanExtra(EXTRA_SHOW_SHEET, false)
         navigate(if (pasted) router.routeForPasted(url) else router.routeFor(url))
-    }
-
-    private fun requestStartupPermissions() {
-        // Only what this Android version needs: notifications (13+) and storage (10 and older).
-        val perms = (Permissions.notifications + Permissions.storageWrite).filterNot { Permissions.granted(this, arrayOf(it)) }
-        if (perms.isNotEmpty()) permissionLauncher.launch(perms.toTypedArray())
     }
 
     companion object {
