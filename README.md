@@ -6,12 +6,12 @@
 
 **Search, watch and download videos and music from YouTube and 1,800+ sites. Open source, no ads, no account.**
 
-[![CI](https://github.com/devgalib/DUO/actions/workflows/ci.yml/badge.svg)](https://github.com/devgalib/DUO/actions/workflows/ci.yml)
-[![Release](https://img.shields.io/github/v/release/devgalib/DUO?label=download&color=1DD8B8)](https://github.com/devgalib/DUO/releases/latest)
+[![CI](https://github.com/savan5685k-beep/DUO-Tube/actions/workflows/ci.yml/badge.svg)](https://github.com/savan5685k-beep/DUO-Tube/actions/workflows/ci.yml)
+[![Release](https://img.shields.io/github/v/release/savan5685k-beep/DUO-Tube?label=download&color=1DD8B8)](https://github.com/savan5685k-beep/DUO-Tube/releases/latest)
 [![License: GPL v3](https://img.shields.io/badge/license-GPL--3.0-6C8CFF)](LICENSE)
 ![Android 7.0+](https://img.shields.io/badge/Android-7.0%2B-3DDC84?logo=android&logoColor=white)
 
-[**Download the latest APK**](https://github.com/devgalib/DUO/releases/latest) · [Report a bug](https://github.com/devgalib/DUO/issues/new/choose) · [Contribute](CONTRIBUTING.md)
+[**Download the latest APK**](https://github.com/savan5685k-beep/DUO-Tube/releases/latest) · [Report a bug](https://github.com/savan5685k-beep/DUO-Tube/issues/new/choose) · [Contribute](CONTRIBUTING.md)
 
 </div>
 
@@ -38,7 +38,7 @@
 
 ## Install
 
-1. Open the [latest release](https://github.com/devgalib/DUO/releases/latest) on your phone and download
+1. Open the [latest release](https://github.com/savan5685k-beep/DUO-Tube/releases/latest) on your phone and download
    `DUO-vX.Y.Z-arm64-v8a.apk` (almost every phone from the last 8 years), `…-armeabi-v7a.apk` for older 32-bit phones,
    or the larger `DUO-vX.Y.Z.apk` that runs on both.
 2. Open it and allow "Install unknown apps" for your browser when Android asks.
