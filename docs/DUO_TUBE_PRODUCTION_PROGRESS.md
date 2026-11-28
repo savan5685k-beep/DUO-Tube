@@ -110,3 +110,15 @@ Production readiness is not declared.
 - Investigated failing QA APK workflow run 46150919729. Root cause was a missing Compose import: `detectHorizontalDragGestures` was referenced from HomeScreen but unresolved in compilation.
 - Added explicit import and replaced fully qualified reference with imported function in commit `1d10fe3e0678d99eca1d3a728a3099d5a1ab267f`.
 - Fresh CI and APK workflows started for the fix commit. Validation remains pending; recheck before declaring fixed.
+
+
+## QA verification — 2026-11-28 (latest code commit 7724fdc8)
+
+- Main code SHA verified: `7724fdc848bca3739f39922809834ad25c1c9506`.
+- CI run `46151362448`: **success** — debug APK build and unit tests passed.
+- QA APK run `46151362488`: **success** — optimized QA APK build, collection/package/signature verification, unit tests, and artifact upload passed.
+- Mirror run `46151362440`: completed successfully; mirror push steps were skipped by workflow conditions.
+- QA artifact `DUO-QA-APK`, ID `15265919083`, downloaded and locally verified. ZIP test passed; it contains arm64, arm32, and universal APKs. Artifact ZIP SHA-256: `93aa42bfac5547916d745bf9ee4179f55e823d8db913ba2ff9efcbf8140c3316`. Individual APK SHA-256: arm64 `5d3315a2f100fe8bed756fdb21ae1f3f115321b45a3e5581b46f42d86c565ea3`; arm32 `12c551698cfb26855410a5a9328df040e543b9189be58a68d890a3c77df6428c`; universal `1947b22a593475dfcfaeeace83a1f255ece0deccce72b8056388d24ce3a44651`. Artifact expires 2026-12-12 UTC.
+- The workflow's APK signature/package verification succeeded. No actual Android device installation or runtime QA has been performed in this session.
+- Source inspection for the next implementation task was blocked: GitHub repository code-search calls returned no matches, and GitHub tree/archive browsing is unavailable in this environment. No speculative source edit or code commit was made.
+- Next scope remains in-app WhatsApp Status media viewer, swipe-entry/resizable PiP, repository-backed release-check UX, and a review/remediation of the WebView JavaScript bridges. The bridge security review is not resolved; crash root cause is still not reproducible without device logs.
