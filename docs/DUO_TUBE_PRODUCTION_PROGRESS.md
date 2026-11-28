@@ -4,8 +4,9 @@ Updated: 2026-11-28
 
 ## Current main
 
-- SHA: 06b61076e7636f7513aa3410cb39d1ab1c91ecb7
-- Current main includes the branding, voice-search, privacy, security, search-suggestion, and download-flow changes plus a test fix for DUO metadata.
+- SHA at this status update: 26ac32b4a4ea41450ff394888e1620e9aee03691.
+- Includes the branding, voice-search, privacy, security, filtering, and download-flow changes plus the QA-install workflow correction.
+
 
 ## Implemented
 
@@ -16,7 +17,7 @@ Updated: 2026-11-28
 - In-app updater/APK installation flow and install permission removed.
 - Analytics/crash telemetry SDKs and unused games Remote Config fetch removed; analytics abstraction is no-op.
 - Voice-search permission is requested only when the user invokes voice search. Voice results fill the query without auto-submit.
-- Android voice search now offers Auto, Hindi (`hi-IN`), and English (`en-IN`) modes. Auto allows Android 14+ service language detection and otherwise uses the device/recognizer language; explicit Hindi/English modes pass language and preference extras. This change is awaiting CI/device verification.
+- Android voice search now offers Auto, Hindi (`hi-IN`), and English (`en-IN`) modes. CI passed on commit aed2b23f4e94ad9d4c42cd315290916ec1d73dd7; device speech-provider availability remains unverified.
 - URL/content filtering is applied in the browser, search, share/open routing, download-sheet, and bulk-download flows. WebView Safe Browsing, mixed-content blocking, and SSL-error cancellation are enabled.
 - Existing content filter is retained. I will not expand or publish explicit domain/keyword lists; generic filter logic and privacy/security review can continue.
 
@@ -36,6 +37,16 @@ Updated: 2026-11-28
 - CI run 46140412771 on d57cc6cf: **passed**. Debug APK build and unit tests both succeeded; test-report upload was skipped because no failure report was needed.
 - APK workflow 46140412687 on the same SHA: **passed**. Build, unit tests, and APK artifact upload succeeded.
 - Artifact `DUO-debug-apk` (ID 15261108167) was downloaded and verified. ZIP test passed; it contains universal, arm64-v8a, and armeabi-v7a debug APKs. Artifact SHA-256: `9c36d0fa204b2812cb1cb0716ca3fca563e5921eb6d99f2ba7b0acfb56346565`. Universal APK ZIP integrity test passed; SHA-256: `e5f264cdf93818738b9239ff469351235218760bbd2786153b0f8e90b00bd74e`. This is a debug QA build, not a release-signed production APK.
+
+## Installation-conflict QA iteration (2026-11-28)
+
+- Screenshot reported Android package-conflict installation error. The likely cause was the CI debug APK using the production package ID and a runner-generated debug signing certificate, which can differ between GitHub runners. A release-signed install also cannot be updated with a debug-signed APK.
+- Commit 7534fc1d switches the automated APK workflow to the optimized QA variant with package ID suffix `.qa`, so it installs alongside the production app. Both main and manual QA workflows cache a dedicated QA debug keystore and serialize builds to avoid competing first-run keys.
+- CI run 46146211710 on aed2b23f: **passed** (debug build and unit tests).
+- QA APK workflow run 46146198322 on 7534fc1d: **passed**. It built the arm64, arm32, and universal QA APKs, verified signatures and `com.savan5685k.duo.qa` package IDs with Android build tools, ran tests, and uploaded artifact ID 15263584207.
+- Verified QA certificate SHA-256: `491877412845f1874c2003b9ebc0db3895859d0c95f1421a36be3344efc99862`. Workflow commits 458a30ca and 26ac32b4 pin this public debug-certificate fingerprint so cache loss/key rotation fails closed instead of silently producing an incompatible update. These fingerprint-pin workflow commits are awaiting their own CI/build validation.
+- Artifact ZIP SHA-256: `6833c32b3ad93a2d33dc7676eb2d7cc76a59fb2467219a92f4453c582d5df362`; ZIP integrity passed. Universal APK SHA-256: `79003b121305c77a39f4c57b78afa39037d8c9daff21badee819ceb896cedf4f`; arm64 APK SHA-256: `2187a6dc5bb796c51be7e7e19b59d0c5ac4fa06b86ddbed36831d963f056162a`.
+- Artifact expires 2026-12-12. This is a debug-signed QA variant, not a production release. Its `.qa` package can coexist with the installed DUO package; it does not replace/update a release-signed production installation.
 
 ## Privacy and security audit
 
@@ -58,11 +69,11 @@ Production readiness is not declared.
 - No Firebase/Crashlytics/analytics SDK entries found in the version catalog; the analytics module is no-op. This is a static dependency/config review, not a runtime packet capture.
 - WebView: Safe Browsing enabled (API 26+), mixed content disallowed, SSL failures cancelled, and third-party cookies disabled. Cleartext HTTP remains globally enabled for browser/downloader compatibility.
 - **Outstanding WebView security review:** `QtSniffer` and `QtFetch` JavaScript interfaces are attached to the browsing WebView and exposed to page JavaScript across arbitrary sites. `QtFetch` only returns results for pending IDs, but no per-origin bridge allowlist is visible. Before release, review whether media-sniffing bridges can be restricted by origin/navigation lifecycle or safely redesigned. Do not treat this as resolved.
-- APK signature verification with `apksigner` was not available in this runtime. APK and artifact ZIP integrity checks passed; no device install/runtime test has been performed.
+- APK signatures and package IDs are now verified in GitHub Actions with `apksigner` and `apkanalyzer`; artifact ZIP integrity is checked after download. No on-device install/update/runtime test has been performed.
 
 
 ## Latest iteration
 
-- d57cc6cf CI run 46140412771 passed (debug APK build and unit tests). APK workflow 46140412687 passed and uploaded verified debug artifact ID 15261108167. ZIP integrity checks passed; artifact SHA-256 `9c36d0fa204b2812cb1cb0716ca3fca563e5921eb6d99f2ba7b0acfb56346565`; universal APK SHA-256 `e5f264cdf93818738b9239ff469351235218760bbd2786153b0f8e90b00bd74e`.
-- Voice language chooser commits 7864e832 and e65616fe. The first CI run for 7864e832 was cancelled when the UI refinement landed; the latest CI and APK workflow on e65616fe were running at the time of this update. Do not claim their pass until checked.
-- Current QA downloads are debug builds, not release-signed production APKs. `apksigner` is unavailable here, so signature verification and device installation/runtime tests remain unperformed.
+- Latest workflow-code commits 7534fc1d, aed2b23f, 458a30ca, and 26ac32b4 implement QA package separation, stable debug signing cache, and a pinned QA certificate. CI on aed2b23f passed; QA build/test/signature/package verification on 7534fc1d passed. The fingerprint-pin commits are awaiting their latest main CI/APK workflow results.
+- Last verified QA APK artifact is from 7534fc1d, artifact ID 15263584207. It contains three APKs; all signatures and `.qa` package IDs were verified and ZIP integrity passed. A build on the fingerprint-pinned latest main is still required before calling it the latest artifact.
+- Production readiness is not declared. Device QA and the WebView JavaScript-bridge security review remain outstanding.
