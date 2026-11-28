@@ -26,7 +26,7 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "QuickTube"
+rootProject.name = "DUO"
 enableFeaturePreview("TYPESAFE_PROJECT_ACCESSORS")
 
 include(":app")
