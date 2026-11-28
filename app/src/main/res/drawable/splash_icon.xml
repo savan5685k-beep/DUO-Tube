@@ -1,2 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
-<layer-list xmlns:android="http://schemas.android.com/apk/res/android"><item android:drawable="@drawable/ic_launcher_background"/><item android:drawable="@drawable/ic_launcher_foreground" android:width="108dp" android:height="108dp" android:gravity="center"/></layer-list>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+    <path android:fillColor="#FF00D7E8" android:pathData="M25,25 H83 Q90,25 90,32 V76 Q90,83 83,83 H25 Q18,83 18,76 V32 Q18,25 25,25 Z"/>
+    <path android:fillColor="#FF07131A" android:pathData="M43,36 Q39,33 39,39 V69 Q39,75 45,71 L67,57 Q72,53 67,50 Z"/>
+    <path android:strokeColor="#FFFFFFFF" android:strokeWidth="5" android:strokeLineCap="round" android:strokeLineJoin="round" android:fillColor="@android:color/transparent" android:pathData="M17,18 H31 M17,18 V32 M91,90 H77 M91,90 V76"/>
+</vector>
