@@ -101,9 +101,9 @@ import org.koin.compose.koinInject
 
 private val tabs = listOf(
     NavTab(HomeRoute, "Download", QtIcons.Download, QtIcons.Download),
+    NavTab(StatusSaverRoute, "Status", QtIcons.Downloading, QtIcons.Downloading),
     NavTab(LibraryRoute, "Play", QtIcons.PlayCircleOutline, QtIcons.PlayCircle),
     NavTab(GalleryRoute, "Gallery", QtIcons.Gallery, QtIcons.GalleryFilled),
-    NavTab(StatusSaverRoute, "Status", QtIcons.Downloading, QtIcons.Downloading),
     NavTab(SettingsRoute, "Settings", QtIcons.Settings, QtIcons.SettingsFilled),
 )
 
@@ -182,7 +182,7 @@ fun AppNavHost(nav: NavHostController) {
     Row(Modifier.fillMaxSize()) {
     if (rail) com.edureminder.quicktube.core.ui.QtNavRail(
         tabs.map { com.edureminder.quicktube.core.ui.QtNavItem(it.label, it.icon, it.selectedIcon) }, selectedTab.coerceAtLeast(0), { selectTab(it) },
-        badges = mapOf(1 to activeCount), expanded = widthClass == com.edureminder.quicktube.core.ui.WidthClass.EXPANDED,
+        badges = mapOf(2 to activeCount), expanded = widthClass == com.edureminder.quicktube.core.ui.WidthClass.EXPANDED,
     )
     Box(Modifier.weight(1f).fillMaxHeight()) {
         // Tab screens draw behind the floating bar (and see their content through the gaps around it);
