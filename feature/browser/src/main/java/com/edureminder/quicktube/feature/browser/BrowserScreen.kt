@@ -92,15 +92,24 @@ private val DUO_BLOCKED_HOSTS = setOf(
     "tnaflix.com", "beeg.com", "porntrex.com", "porn.com", "rule34.xxx",
     "chaturbate.com", "stripchat.com", "livejasmin.com", "cam4.com", "myfreecams.com",
     "onlyfans.com", "fansly.com", "manyvids.com", "nhentai.net", "hentaihaven.xxx",
-    "hanime.tv", "hentaistream.com"
+    "hanime.tv", "hentaistream.com", "f95zone.to", "literotica.com", "sex.com",
+    "adultfriendfinder.com", "ashleyma​dison.com", "brazzers.com", "bangbros.com",
+    "mofos.com", "naughtyamerica.com", "realitykings.com", "digitalplayground.com",
+    "javhd.com", "javlibrary.com", "avgle.com", "sxyprn.com", "motherless.com",
+    "heavy-r.com", "ixxx.com", "porndig.com", "pornhub.org", "pornhub.net",
+    "xvideos2.com", "xvideos3.com", "xnxx2.com", "xnxx3.com"
 )
 private val DUO_BLOCKED_TERMS = Regex(
-    "(?i)(\\b(porn|porno|pornography|xxx|sexcam|webcamsex|hentai|rule34|nsfw|adultcontent|erotic)\\b)"
+    "(?i)(\\b(porn|porno|pornography|xxx|sexcam|webcamsex|hentai|rule34|nsfw|adultcontent|adult-content|erotic|explicit-content|sex-content)\\b)"
 )
 private fun duoBlockedUrl(raw: String): Boolean {
     val uri = runCatching { Uri.parse(raw) }.getOrNull() ?: return false
-    val host = uri.host?.lowercase()?.removePrefix("www.") ?: return false
-    val hostBlocked = DUO_BLOCKED_HOSTS.any { host == it || host.endsWith(".$it") }
+    val host = uri.host?.lowercase()?.trimEnd('.')?.removePrefix("www.") ?: return false
+    // Only HTTP(S) pages are considered here. Host matching is exact or a true subdomain
+    // suffix (never a substring such as "notpornhub.com").
+    val scheme = uri.scheme?.lowercase()
+    val hostBlocked = (scheme == "http" || scheme == "https") &&
+        DUO_BLOCKED_HOSTS.any { host == it || host.endsWith(".$it") }
     val textBlocked = DUO_BLOCKED_TERMS.containsMatchIn(raw)
     return hostBlocked || textBlocked
 }
