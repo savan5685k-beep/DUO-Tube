@@ -44,6 +44,8 @@ import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
@@ -256,6 +258,7 @@ fun BrowserScreen(
     val addressFocus = remember { androidx.compose.ui.focus.FocusRequester() }
     LaunchedEffect(editing) { if (editing) runCatching { addressFocus.requestFocus() } }
     var menu by remember { mutableStateOf(false) }
+    var showClearWebsiteData by remember { mutableStateOf(false) }
     var customView by remember { mutableStateOf<View?>(null) }
     // "Continue with Google/Facebook…" opens its sign-in page in a window of its own, shown over the page.
     var signIn by remember { mutableStateOf<WebView?>(null) }
@@ -345,6 +348,7 @@ fun BrowserScreen(
                             onClick = { menu = false; onOpenBookmarks() })
                         DropdownMenuItem(text = { Text("History") }, leadingIcon = { Icon(QtIcons.History, null) },
                             onClick = { menu = false; onOpenHistory() })
+                        DropdownMenuItem(text = { Text("Clear website data") }, leadingIcon = { Icon(QtIcons.Delete, null) }, onClick = { menu = false; showClearWebsiteData = true })
                         DropdownMenuItem(text = { Text("Copy link") }, leadingIcon = { Icon(QtIcons.ContentCopy, null) }, onClick = {
                             context.getSystemService(ClipboardManager::class.java).setPrimaryClip(ClipData.newPlainText("url", ui.url))
                             menu = false
@@ -538,6 +542,29 @@ fun BrowserScreen(
         }
         // Closed by hand: the page reloads so a sign-in that finished in the window shows.
         signIn?.let { w -> SignInOverlay(w, onClose = { signInWindows.close(); webView?.reload() }) }
+    }
+
+    if (showClearWebsiteData) {
+        AlertDialog(
+            onDismissRequest = { showClearWebsiteData = false },
+            title = { Text("Clear website data?") },
+            text = { Text("This clears saved website cookies, cache, local storage and the current WebView session. You may be signed out of websites. It does not delete DUO's separate browser history or saved pages.") },
+            confirmButton = {
+                TextButton(onClick = {
+                    showClearWebsiteData = false
+                    webView?.apply { clearCache(true); clearHistory(); clearFormData() }
+                    CookieManager.getInstance().removeAllCookies(null)
+                    CookieManager.getInstance().flush()
+                    android.webkit.WebStorage.getInstance().deleteAllData()
+                    signInWindows.close()
+                    signIn = null
+                    Toast.makeText(context, "Website data cleared", Toast.LENGTH_SHORT).show()
+                }) { Text("Clear") }
+            },
+            dismissButton = {
+                TextButton(onClick = { showClearWebsiteData = false }) { Text("Cancel") }
+            },
+        )
     }
 
     // Leaving the browser or the app keeps the sessions too.
