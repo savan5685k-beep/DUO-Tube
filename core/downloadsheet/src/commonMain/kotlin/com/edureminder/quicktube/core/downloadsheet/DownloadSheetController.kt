@@ -28,9 +28,10 @@ sealed interface SheetTarget {
         val items: Boolean = false,
     ) : SheetTarget
 
-    /** Streams a web page loaded for the video being watched; resolved to the matching one(s) when the sheet opens. */
+    /** A URL or media candidate was blocked by DUO Safe Browsing. */
     data class Blocked(val url: String) : SheetTarget
 
+    /** Streams a web page loaded for the video being watched; resolved to the matching one(s) when the sheet opens. */
     data class Sniffed(
         val title: String,
         val pageUrl: String,

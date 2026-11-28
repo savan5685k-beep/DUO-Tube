@@ -1,19 +1,24 @@
 # DUO-Tube Branding & QA Log
 
-## Iteration 1 — Branding, suggestions, privacy, and security cleanup
+## Iteration 2 — UI, privacy, and security
 
-- Renamed the fourth home tab to WhatsApp Saver and wired it to the existing saver screen.
-- Removed the promotional games row, game refresh dependency, and unused games navigation.
-- Restricted quick-site suggestions to YouTube, Instagram, and Facebook; removed the generic Sites suggestion button.
-- Search suggestions now show only the three allowed sites; legacy built-in sites are hidden from suggestions while user-added sites remain.
-- Updated About, share instructions, and backup filename prefix to DUO branding.
-- Removed the app-uninstaller entry point and broad package-discovery permissions.
-- Added a vector DUO splash logo and welcome screen.
-- Strengthened the adult URL guard with additional explicit terms and JVM-testable domain-suffix/keyword cases.
-- Analytics and crash-reporting SDKs remain absent; website requests and manual updater requests are external-service traffic, not telemetry.
+- DUO branding and vector splash/welcome artwork retained.
+- Quick website suggestions are limited to YouTube, Instagram, and Facebook.
+- Status Saver is reachable through bottom navigation and opens directly.
+- About/search branding updated; Quick Apps/Games promotional flow removed.
+- In-app updater/APK installation flow and install permission removed.
+- Analytics/crash telemetry SDKs and unused games Remote Config fetch removed.
+- Voice-search permission is requested only when voice search is invoked; speech results fill the query without auto-submit.
+- WebView Safe Browsing enabled; mixed content is blocked on HTTPS pages; SSL errors are cancelled.
+- URL/content filtering is applied across browser, search, share, download-sheet, and bulk routes. It cannot classify all images/videos hosted on allowed sites.
 
-### Validation and limitations
+### Validation
 
-- The previous debug APK build for commit e6603368 completed successfully; later CI builds are still in progress/cancelled as newer commits superseded them.
-- This adult-content filter is domain/URL-keyword based and WebView Safe Browsing; it cannot guarantee detection of explicit imagery/video embedded on allowed sites.
-- Voice search, permission-on-demand refinements, and full outbound-network audit remain outstanding.
+- Commit 6cefe7c9: CI and APK build passed.
+- Later iterations exposed test/build failures. Fixes were committed, but latest tests are pending or logs unavailable.
+- Latest main SHA: 3e2c7688d7b4692589bd3dc9b13e164aed300c2c. No latest QA APK has been verified.
+
+### Remaining
+
+- Review cleartext HTTP support, JavaScript bridges, and exported MediaSession access.
+- Device QA: voice recognition, permission denial/grant, Status Saver, downloads, browser, PiP, and UI.

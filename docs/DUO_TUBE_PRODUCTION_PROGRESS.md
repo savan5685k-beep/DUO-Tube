@@ -2,59 +2,44 @@
 
 Updated: 2026-11-28
 
-## Latest iteration (games/Remote Config removal and compile fix)
+## Current main
 
-- Removed Android Firebase Remote Config games fetch, desktop Firebase REST fetch, cached games data/model, games screens and openers, and their test/template docs.
-- Removed Firebase Remote Config dependencies from `core:data`, the unused Google Services/Crashlytics plugin aliases, and desktop build-time generation of Firebase client config.
-- Updated README and privacy docs: no in-app updater/APK installer, no analytics/crash telemetry, quick suggestions are only YouTube/Instagram/Facebook; voice-recognition provider disclosure added.
-- The first removal commit accidentally copied the common `expect` analytics declarations into the Android platform file instead of its `actual` Koin binding. CI/APK builds failed; this fix restores the Android no-op `actual` binding and removes the stale “games” platform comment.
-- Previous verified main `d1e044809970ce9f763544403bf71f0e9b6c199d` has successful CI and APK build (run 46131065044 and 46131065119). The QA artifact SHA-256 is `a04fd84fdee03e270cacd73bcc4cf84ae53aa2ef9b118570f05cfd7db0e74b2e`; it contains arm64, armeabi-v7a, and universal debug APKs. New fix commit validation is pending.
+- SHA: 3e2c7688d7b4692589bd3dc9b13e164aed300c2c
+- Current main contains the latest branding, voice-search, privacy, security, search-suggestion, and download-flow changes. Concurrent commits are being checked against CI/APK runs.
 
-## Earlier iteration
+## Implemented
 
-### Changes committed
+- DUO branding, vector splash artwork, and welcome UI.
+- Removed Quick Apps/Games promotional flow and unused games-fetch dependency.
+- Status Saver is available through bottom navigation and opens its saver screen directly.
+- About/search branding updated; quick website choices restricted to YouTube, Instagram, and Facebook.
+- In-app updater/APK installation flow and install permission removed.
+- Analytics/crash telemetry SDKs and unused games Remote Config fetch removed; analytics abstraction is no-op.
+- Voice-search permission is requested only when the user invokes voice search. Voice results fill the query without auto-submit.
+- URL/content filtering is applied in the browser, search, share/open routing, download-sheet, and bulk-download flows. WebView Safe Browsing, mixed-content blocking, and SSL-error cancellation are enabled.
+- Existing content filter is retained. I will not expand or publish explicit domain/keyword lists; generic filter logic and privacy/security review can continue.
 
-- `a7056243` — isolated adult URL filtering from `BrowserScreen.kt`.
-- `5caa6f90` — expanded conservative adult-domain list and explicit URL/search-term filtering in `BrowserContentFilter.kt`.
-- `4bc4e305` — Android-compatible URL decoding for encoded filter terms.
-- `47c510b2` — added `BrowserContentFilterTest.kt` covering known hosts/subdomains, deceptive suffixes, normalization, encoded terms, and ordinary URLs.
-- `e8171733` — guard platform WebView Safe Browsing setting on API 26+ (minSdk 24).
-- `673e0b84`, `0aa3b664`, `070822fb`, `33661d90` — remove the in-app APK updater from app startup, Settings, DI, dependencies, and the project; delete `core/update` module sources. DUO no longer has an APK-install/update feature or install-from-unknown-sources flow in the app.
-- `ccba880d`, `aabec2df`, `9cbe2d10`, `13ec78a6`, `7138e174`, `d44702b0`, `8140d55e` — add Android voice-search UI with Hindi/English selection, runtime microphone permission requested only after choosing voice search, Android SpeechRecognizer integration, desktop text-only fallback, and required Activity Compose dependency.
+## Commits and validation
 
-### Files touched
+- 6cefe7c9 — WebView mixed-content and SSL hardening. CI and APK build passed (runs 46137888439 and 46137888493).
+- f76141e0 — search filtering, quick-site restrictions, branding, and splash. APK build step succeeded but tests failed; the false-positive handling was corrected later.
+- e396563f — result metadata filtering. Build failed due a missing model import; corrected in 55a0ebce.
+- 43deff58 — test import fix. Build still failed due the corresponding main-source import; corrected in 55a0ebce.
+- 55a0ebce — common URL/search filter and host parsing. APK build step passed, but unit tests failed. GitHub log retrieval returned unavailable logs; a failed-job rerun is pending, so the root cause is not confirmed.
+- 7da1d049 — blocking at share, download-sheet, and bulk routes. APK build step passed; unit tests were still running when newer commits cancelled CI.
+- 68f7ebd5 — subscriptions/playlists UI changes; mirror succeeded, APK build was still in progress.
+- 3e2c7688 — tab-transition refinement; mirror succeeded, CI/APK were in progress.
+- The latest APK artifact has not been verified or promoted as a QA download.
 
-- `feature/browser/.../BrowserScreen.kt`
-- `feature/browser/.../BrowserContentFilter.kt` (new)
-- `feature/browser/src/test/.../BrowserContentFilterTest.kt` (new)
-- `feature/search/.../SearchScreen.kt`
-- `feature/search/.../VoiceSearchControl.kt` (new expect declaration)
-- `feature/search/src/androidMain/.../VoiceSearchControl.android.kt` (new)
-- `feature/search/src/desktopMain/.../VoiceSearchControl.desktop.kt` (new)
-- `feature/search/src/androidMain/AndroidManifest.xml` (new microphone permission)
-- `feature/search/build.gradle.kts`
-- `app/build.gradle.kts`
-- `app/src/main/.../MainActivity.kt`
-- `app/src/main/.../QuickTubeApplication.kt`
-- `app/src/main/.../di/AppModule.kt`
-- `feature/settings/build.gradle.kts`
-- `feature/settings/src/main/.../SettingsScreen.kt`
-- `settings.gradle.kts`
-- Removed `core/update` module files and tests.
+## Privacy and security audit
 
-## Tests and CI
+- No analytics/crash telemetry SDK is present; the games Remote Config fetch is removed.
+- Microphone permission is on-demand. The Android system speech-recognition provider may process audio off-device; DUO does not store voice recordings.
+- WebView Safe Browsing is enabled; mixed HTTP subresources are blocked on HTTPS pages; SSL errors are cancelled.
+- Cleartext HTTP remains enabled for user-directed browser/downloader HTTP support. This is a residual risk, not a blanket recommendation.
+- The exported MediaSession is intentional for external playback controls. Media3 provides read-only access to untrusted controllers by default; trusted controllers may control playback.
+- JavaScript bridge interfaces remain a WebView review item because media sniffing needs page integration.
+- URL filtering cannot classify every image/video hosted on otherwise allowed sites.
+- Device QA is still required for permissions, Hindi/English speech-recognition availability, downloads, Status Saver, PiP, WebView behavior, and the complete UI.
 
-- Commit `ccb91c93` (games/Remote Config removal): CI [46132709052](https://github.com/savan5685k-beep/DUO-Tube/actions/runs/46132709052) — **failed**; APK build [46132708939](https://github.com/savan5685k-beep/DUO-Tube/actions/runs/46132708939) — **failed**. Root cause: Android analytics actual binding was missing after the no-op file rename.
-- GitLab mirror for `ccb91c93`: [46132709013](https://github.com/savan5685k-beep/DUO-Tube/actions/runs/46132709013) — success.
-- Fix commit restores the Android Koin `actual analyticsModule` binding; its CI/APK runs are pending.
-- Previous verified main `d1e04480`: CI [46131065044](https://github.com/savan5685k-beep/DUO-Tube/actions/runs/46131065044) and APK build [46131065119](https://github.com/savan5685k-beep/DUO-Tube/actions/runs/46131065119) — success; artifact SHA-256 `a04fd84fdee03e270cacd73bcc4cf84ae53aa2ef9b118570f05cfd7db0e74b2e`.
-
-## Remaining audit / blockers
-
-- Device-level QA is still required for permission denial/grant, Hindi/English speech recognition availability, WebView behavior, downloads, WhatsApp Saver, and update distribution via manual GitHub Releases.
-- Android voice recognition uses the device/system speech service; that provider may process audio off-device. DUO itself does not record or upload voice audio.
-- URL/domain filtering cannot guarantee classification of explicit image/video content hosted on allowed sites.
-- `usesCleartextTraffic=true` remains under review because the browser/downloader may intentionally support HTTP.
-- Verify that Remote Config/game-fetch code and Firebase dependencies are absent from the current tree and CI output.
-- Exported MediaSession service is intentional for external media controls; controller access policy remains under review.
-- Production readiness is not declared.
+Production readiness is not declared.

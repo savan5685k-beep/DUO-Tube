@@ -1,19 +1,13 @@
-# Privacy — DUO privacy-focused fork
+# Privacy
 
-DUO has no accounts and no server of its own. Downloads, history, vault, playlists and settings are stored on-device.
+DUO Tube does not include analytics or crash-reporting SDKs. The analytics abstraction is no-op. The unused games Remote Config fetch was removed.
 
-## Data collection and telemetry
+The app makes network requests when the user searches, opens websites, or downloads media. Media extraction may contact the website/provider the user selected. Browser and downloader HTTP support remains enabled for user-directed HTTP links; HTTPS pages block mixed HTTP subresources and WebView SSL errors are cancelled.
 
-This fork removes Firebase Analytics and Crashlytics dependencies and uses a no-op analytics implementation. It does not send analytics events, crash reports, screen-view events, search terms, titles, filenames, or country/device telemetry to an analytics provider.
+Voice search uses the Android system speech-recognition service. Depending on the provider and device, audio may be processed off-device. DUO does not record or store voice audio. Microphone permission is requested only after the user invokes voice search.
 
-## Automatic network activity
+Media/gallery access is requested only for the related feature. APK installation/updating is not an in-app feature and no installer permission is requested.
 
-DUO has no in-app APK updater or installer. App updates are distributed through the official release page and installed only through Android's user-controlled install flow. No in-app update check contacts GitHub. Automatic channel polling and automatic yt-dlp engine-update checks are disabled in this fork. Firebase Remote Config is not used.
+The exported MediaSession is used for external playback controls. Media3 default policy gives untrusted controllers read-only access; trusted controllers may control playback.
 
-## Network needed for app features
-
-When you actively browse, search, stream or download media, DUO must make requests to the websites and media hosts you choose. Those services receive ordinary network request information such as your IP address and the URL requested. This traffic is required for those online features and is not telemetry. Offline files can be played without these media requests.
-
-Voice search uses the Android system speech-recognition service; the chosen provider may process audio off-device. DUO itself does not record or upload voice audio.
-
-The app is not a network firewall: it cannot block all network traffic while still providing online search, browsing, streaming, and downloads. For fully offline use, do not use online features.
+WebView JavaScript bridges are used for media sniffing/extraction. They remain a security-review item because they are available to page scripts. URL filtering and WebView Safe Browsing are enabled, but URL filters cannot classify all images/videos hosted on allowed sites.

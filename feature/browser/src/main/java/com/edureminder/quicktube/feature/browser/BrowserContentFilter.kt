@@ -32,8 +32,7 @@ internal fun duoBlockedUrl(raw: String): Boolean {
     val host = uri?.let(::normalizedHost)
     val hostBlocked = (scheme == "http" || scheme == "https") && host != null && AdultContentFilter.isBlockedHost(host)
 
-    // Decode at most twice to catch ordinary and double-encoded search terms without unbounded decoding.
-    var candidate = raw
+    // Keyword checks use the shared bounded-decoding filter.
     val termBlocked = AdultContentFilter.isBlockedText(raw)
     return hostBlocked || termBlocked
 }
