@@ -202,11 +202,11 @@ fun AboutScreen(onBack: () -> Unit) {
                     .background(LocalQtExtras.current.brand),
                 contentAlignment = Alignment.Center,
             ) { androidx.compose.material3.Icon(QtIcons.Download, null, tint = MaterialTheme.colorScheme.onPrimary, modifier = Modifier.size(44.dp)) }
-            Text("QuickTube", style = BrandTitle.copy(brush = LocalQtExtras.current.brand))
+            Text("DUO Tube", style = BrandTitle.copy(brush = LocalQtExtras.current.brand))
             Text("Version ${appVersion(context)}", color = MaterialTheme.colorScheme.onSurfaceVariant)
             Text(
-                "Search, watch and download videos and music from YouTube and the web. " +
-                    "Share any link to QuickTube to download without leaving the app you're in.",
+                "Search, watch and save supported media from services you choose. " +
+                    "Share supported media links with DUO Tube to save them locally.",
                 textAlign = TextAlign.Center, modifier = Modifier.padding(vertical = 24.dp),
             )
             Text("Open-source software", style = MaterialTheme.typography.titleSmall)
@@ -217,7 +217,7 @@ fun AboutScreen(onBack: () -> Unit) {
                 color = MaterialTheme.colorScheme.onSurfaceVariant, modifier = Modifier.fillMaxWidth().padding(top = 8.dp),
             )
             Text(
-                "Only download content you have the right to save. Respect the terms of the sites you use.",
+                "DUO Tube does not include analytics or crash-reporting telemetry. External services may receive requests when you use their websites or features. Only save content you are authorized to keep.",
                 textAlign = TextAlign.Center, style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant, modifier = Modifier.padding(top = 24.dp),
             )
