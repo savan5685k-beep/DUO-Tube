@@ -31,7 +31,7 @@ android {
     }
 
     defaultConfig {
-        applicationId = "com.edureminder.quicktube"
+        applicationId = "com.savan5685k.duo"
         // CI sets these from the release run (see .github/workflows/release.yml); local builds are "dev".
         versionCode = (project.findProperty("appVersionCode") as String?)?.toInt() ?: 1
         versionName = (project.findProperty("appVersionName") as String?) ?: "${project.property("appVersionBase")}.0-dev"
