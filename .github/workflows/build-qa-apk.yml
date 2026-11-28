@@ -6,6 +6,10 @@ on:
 permissions:
   contents: read
 
+concurrency:
+  group: duo-qa-apk-signing
+  cancel-in-progress: false
+
 jobs:
   build:
     name: Build installable QA APK
@@ -18,18 +22,55 @@ jobs:
           distribution: temurin
           java-version: 21
       - uses: gradle/actions/setup-gradle@v4
-      - name: Build optimized QA APKs (debug-signed)
-        run: ./gradlew :app:assembleQa --no-parallel --stacktrace
-      - name: Collect APKs
+
+      - name: Restore stable QA debug signing key
+        uses: actions/cache@v4
+        with:
+          path: ~/.android/debug.keystore
+          key: duo-qa-debug-signing-v1
+
+      - name: Create QA debug key on first run
         run: |
+          mkdir -p "$HOME/.android"
+          if [ ! -f "$HOME/.android/debug.keystore" ]; then
+            keytool -genkeypair -v \
+              -keystore "$HOME/.android/debug.keystore" \
+              -storepass android \
+              -alias androiddebugkey \
+              -keypass android \
+              -dname "CN=Android Debug,O=Android,C=US" \
+              -keyalg RSA -keysize 2048 -validity 10000
+          fi
+          keytool -list -keystore "$HOME/.android/debug.keystore" \
+            -storepass android -alias androiddebugkey >/dev/null
+
+      - name: Build optimized QA APKs (stable debug-signed, .qa package)
+        run: ./gradlew :app:assembleQa --no-parallel --stacktrace
+
+      - name: Collect and verify APKs
+        run: |
+          set -euo pipefail
           mkdir -p dist
-          cp app/build/outputs/apk/qa/*/*.apk dist/ 2>/dev/null || true
-          cp app/build/outputs/apk/qa/*.apk dist/ 2>/dev/null || true
+          find app/build/outputs/apk/qa -type f -name '*.apk' -exec cp {} dist/ \;
           test -n "$(find dist -name '*.apk' -print -quit)" || { echo "No QA APKs found"; exit 1; }
+          apksigner=$(find "$ANDROID_HOME/build-tools" -name apksigner -type f | sort -V | tail -1)
+          apkanalyzer=$(find "$ANDROID_HOME" -name apkanalyzer -type f | head -1)
+          [ -n "$apksigner" ] && [ -n "$apkanalyzer" ] || { echo "Android verification tools not found"; exit 1; }
+          for apk in dist/*.apk; do
+            "$apksigner" verify --verbose --print-certs "$apk"
+            package_id=$("$apkanalyzer" manifest application-id "$apk")
+            echo "$apk package: $package_id"
+            case "$package_id" in
+              *.qa) ;;
+              *) echo "::error::$apk is not a QA-suffixed package"; exit 1 ;;
+            esac
+          done
           ls -lh dist
-      - uses: actions/upload-artifact@v4
+
+      - name: Upload installable QA APK artifact
+        uses: actions/upload-artifact@v4
         with:
           name: DUO-QA-APK
           path: dist/*.apk
           if-no-files-found: error
-          retention-days: 7
+          retention-days: 14
