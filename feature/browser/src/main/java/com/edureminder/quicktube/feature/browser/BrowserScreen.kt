@@ -102,11 +102,10 @@ private fun duoBlockedUrl(raw: String): Boolean {
     val textBlocked = DUO_BLOCKED_TERMS.containsMatchIn(raw)
     return hostBlocked || textBlocked
 }
+private fun duoBlockResponseHtml(): String = """<!doctype html><meta charset="utf-8"><meta name="viewport" content="width=device-width"><title>Blocked</title><body style="font-family:sans-serif;background:#111;color:#eee;padding:24px"><h2>DUO Safe Browsing</h2><p>This page or request was blocked because it may contain adult content.</p><p>Safe browsing protection is enabled.</p></body>"""
 private fun duoBlockResponse(): WebResourceResponse = WebResourceResponse(
     "text/html", "UTF-8", 403, "Blocked by DUO Safe Browsing",
-    mapOf("Cache-Control" to "no-store"), java.io.ByteArrayInputStream(
-        """<!doctype html><meta charset="utf-8"><meta name="viewport" content="width=device-width"><title>Blocked</title><body style="font-family:sans-serif;background:#111;color:#eee;padding:24px"><h2>DUO Safe Browsing</h2><p>This page or request was blocked because it may contain adult content.</p><p>Safe browsing protection is enabled.</p></body>""".toByteArray(Charsets.UTF_8)
-    )
+    mapOf("Cache-Control" to "no-store"), java.io.ByteArrayInputStream(duoBlockResponseHtml().toByteArray(Charsets.UTF_8))
 )
 
 private val YT_WATCH = Regex("""youtube\.com/(watch\?|shorts/)|youtu\.be/""")
