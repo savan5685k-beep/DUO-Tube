@@ -108,8 +108,8 @@ fun SearchScreen(
                 keyboardActions = KeyboardActions(onSearch = { submit(field.text) }),
             )
             VoiceSearchControl(onResult = { text ->
+                // Voice input fills the search field only; the user explicitly submits when ready.
                 field = TextFieldValue(text, TextRange(text.length))
-                submit(text)
             }, onError = { voiceError = it })
             QtIconButton(QtIcons.Download, "Go", { submit(field.text) }, tint = MaterialTheme.colorScheme.onPrimary,
                 container = MaterialTheme.colorScheme.primary, modifier = Modifier.padding(start = 8.dp))
