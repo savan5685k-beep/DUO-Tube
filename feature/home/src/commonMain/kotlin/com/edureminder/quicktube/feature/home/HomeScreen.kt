@@ -8,6 +8,7 @@ import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.background
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
@@ -61,6 +62,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -202,11 +204,16 @@ private fun DiscoverTab(
     val feed by vm.feed.collectAsStateWithLifecycle()
     val showTrending by vm.showTrending.collectAsStateWithLifecycle()
     var clip by remember { mutableStateOf<String?>(null) }
+    var dismissedClipboard by rememberSaveable { mutableStateOf<String?>(null) }
     // Android 10+ only lets an app read the clipboard while its window has focus, which comes after
     // ON_RESUME, so read it whenever focus arrives (coming back from another app included).
     val focused = androidx.compose.ui.platform.LocalWindowInfo.current.isWindowFocused
     // Only links DUO can download are offered (a copied GitHub or news link isn't).
-    LaunchedEffect(focused) { if (focused) clip = Urls.extractUrl(readClipboard())?.takeIf(vm::canDownload) }
+    LaunchedEffect(focused) { if (focused) {
+        val candidate = Urls.extractUrl(readClipboard())?.takeIf(vm::canDownload)
+        clip = candidate?.takeUnless { it == dismissedClipboard }
+        if (candidate != null && candidate != dismissedClipboard) dismissedClipboard = null
+    } }
     val list = rememberLazyListState()
 
     Box(Modifier.fillMaxSize()) {
@@ -272,8 +279,22 @@ private fun DiscoverTab(
                     AnimatedVisibility(clip != null, enter = fadeIn() + expandVertically(), exit = fadeOut() + shrinkVertically()) {
                         val url = clip.orEmpty()
                         Row(
-                            Modifier.padding(top = 14.dp).fillMaxWidth().clip(RoundedCornerShape(20.dp))
+                            Modifier.padding(top = 14.dp).fillMaxWidth().clip(RoundedCornerShape(20.dp)
                                 .background(MaterialTheme.colorScheme.primaryContainer)
+                                .pointerInput(url) {
+                                    var swipeDistance = 0f
+                                    androidx.compose.foundation.gestures.detectHorizontalDragGestures(
+                                        onHorizontalDrag = { _, delta -> swipeDistance += delta },
+                                        onDragEnd = {
+                                            if (swipeDistance > 100.dp.toPx()) {
+                                                dismissedClipboard = url
+                                                clip = null
+                                            }
+                                            swipeDistance = 0f
+                                        },
+                                        onDragCancel = { swipeDistance = 0f },
+                                    )
+                                }
                                 .pressable(scaleDown = 0.98f, onClick = { actions.downloadUrl(url) })
                                 .padding(horizontal = 14.dp, vertical = 12.dp),
                             verticalAlignment = Alignment.CenterVertically,
@@ -283,14 +304,6 @@ private fun DiscoverTab(
                                 Text("Download copied link", style = MaterialTheme.typography.titleSmall, color = MaterialTheme.colorScheme.onPrimaryContainer)
                                 Text(url, maxLines = 1, overflow = TextOverflow.Ellipsis, style = MaterialTheme.typography.bodySmall,
                                     color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = .75f))
-                            }
-                            // Dismiss only the copied-link suggestion; the clipboard and rest of screen remain unchanged.
-                            Box(
-                                Modifier.size(32.dp).clip(CircleShape)
-                                    .pressable(scaleDown = 0.88f, onClick = { clip = null }),
-                                contentAlignment = Alignment.Center,
-                            ) {
-                                Icon(QtIcons.Close, "Dismiss copied link", tint = MaterialTheme.colorScheme.onPrimaryContainer, modifier = Modifier.size(18.dp))
                             }
                             // Its own button: the formats sheet for this link, right here (the card itself opens the page).
                             Box(
