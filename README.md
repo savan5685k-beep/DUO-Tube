@@ -1,23 +1,23 @@
 <div align="center">
 
-<img src="docs/screenshots/banner.jpg" alt="QuickTube: search, watch and download videos and music" width="100%"/>
+<img src="docs/screenshots/banner.jpg" alt="DUO: search, watch and download videos and music" width="100%"/>
 
-# QuickTube
+# DUO
 
 **Search, watch and download videos and music from YouTube and 1,800+ sites. Open source, no ads, no account.**
 
-[![CI](https://github.com/devgalib/QuickTube/actions/workflows/ci.yml/badge.svg)](https://github.com/devgalib/QuickTube/actions/workflows/ci.yml)
-[![Release](https://img.shields.io/github/v/release/devgalib/QuickTube?label=download&color=1DD8B8)](https://github.com/devgalib/QuickTube/releases/latest)
+[![CI](https://github.com/devgalib/DUO/actions/workflows/ci.yml/badge.svg)](https://github.com/devgalib/DUO/actions/workflows/ci.yml)
+[![Release](https://img.shields.io/github/v/release/devgalib/DUO?label=download&color=1DD8B8)](https://github.com/devgalib/DUO/releases/latest)
 [![License: GPL v3](https://img.shields.io/badge/license-GPL--3.0-6C8CFF)](LICENSE)
 ![Android 7.0+](https://img.shields.io/badge/Android-7.0%2B-3DDC84?logo=android&logoColor=white)
 
-[**Download the latest APK**](https://github.com/devgalib/QuickTube/releases/latest) · [Report a bug](https://github.com/devgalib/QuickTube/issues/new/choose) · [Contribute](CONTRIBUTING.md)
+[**Download the latest APK**](https://github.com/devgalib/DUO/releases/latest) · [Report a bug](https://github.com/devgalib/DUO/issues/new/choose) · [Contribute](CONTRIBUTING.md)
 
 </div>
 
 > [!IMPORTANT]
 > Only download content you own or have permission to save, and respect each site's terms of service.
-> QuickTube doesn't bypass DRM and isn't affiliated with YouTube, Google or any other site.
+> DUO doesn't bypass DRM and isn't affiliated with YouTube, Google or any other site.
 
 ## Screenshots
 
@@ -34,18 +34,18 @@
   </tr>
 </table>
 
-<img src="docs/screenshots/07_light.jpg" alt="QuickTube in light mode" width="100%"/>
+<img src="docs/screenshots/07_light.jpg" alt="DUO in light mode" width="100%"/>
 
 ## Install
 
-1. Open the [latest release](https://github.com/devgalib/QuickTube/releases/latest) on your phone and download
-   `QuickTube-vX.Y.Z-arm64-v8a.apk` (almost every phone from the last 8 years), `…-armeabi-v7a.apk` for older 32-bit phones,
-   or the larger `QuickTube-vX.Y.Z.apk` that runs on both.
+1. Open the [latest release](https://github.com/devgalib/DUO/releases/latest) on your phone and download
+   `DUO-vX.Y.Z-arm64-v8a.apk` (almost every phone from the last 8 years), `…-armeabi-v7a.apk` for older 32-bit phones,
+   or the larger `DUO-vX.Y.Z.apk` that runs on both.
 2. Open it and allow "Install unknown apps" for your browser when Android asks.
 3. Optional: check the file against the `.sha256` next to it.
 
 Releases are signed with the same key every time, so updates install over the previous version. After the first install,
-QuickTube tells you when a new version is out and can update itself (Settings → Check for updates).
+DUO tells you when a new version is out and can update itself (Settings → Check for updates).
 
 ## Features
 
@@ -56,7 +56,7 @@ QuickTube tells you when a new version is out and can update itself (Settings �
 | **Video page** | Inline 720p player, Download button, play-in-background (audio only), About sheet (likes, share, watch later), comments, "Up next". Channel and playlist pages. |
 | **Playlists & channels** | **Download all**, or **Select** videos (with select all) and download them together, or download one by one. One quality for the batch (M4A / 360p / 720p / 1080p / best); each video gets its closest format, in the background. |
 | **Download sheet** | "Download video as" with Music (M4A / Opus) and Video (144p–4K) choices, plus a *More formats* page. Video-only streams are merged with audio on-device (no re-encoding). |
-| **Share to download** | "Download with QuickTube" appears in every app's share sheet. The format picker pops up over YouTube, Facebook, TikTok and other apps, and the download continues in the background. |
+| **Share to download** | "Download with DUO" appears in every app's share sheet. The format picker pops up over YouTube, Facebook, TikTok and other apps, and the download continues in the background. |
 | **Browser** | Built-in WebView for any site. On a video page a Download bar appears under the page (even before you press play) from the page's own player data; on listing pages it stays hidden. It offers every quality the page has, plus an audio-only M4A. Pasting or sharing a link opens the download sheet directly. This works with plain MP4 players, HLS (`.m3u8`, including AES-128 encrypted) behind `blob:` players, iframe-embedded players and shadow-DOM players. HLS is converted to MP4 on the phone. YouTube videos open the native page. Sites list (add/delete), history, saved pages. |
 | **Download engine** | Each file is split into 4 MB pieces fetched over up to 8 connections at once, and video and audio download together. Pieces are remembered, so pause, retry or even a killed app resume where they were. Merging runs in-process with Media3 on private storage (a 10-minute 720p video takes a few seconds). Formats are chosen by codec so they can always be saved (H.264 first, AV1 only on Android 14+, VP9 as WebM); if a site still serves one that can't, or a link expires, the page is re-extracted and the download carries on. Queue, Wi-Fi vs mobile task limits, speed limit, notifications. |
 | **Play tab** | Downloading card, downloaded list with filter (music / video / pictures), search, multi-select (share, vault, delete). Item menu: vault, play as audio, convert to audio, share, open with, rename, delete. Remembers playback position. |
@@ -148,7 +148,7 @@ See [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) for the module layout and how t
   True MP3 needs a native encoder (e.g. LAME) added as a library.
 - **DRM**: DRM-protected streams (Widevine, as used by Netflix and paid platforms) and DASH-only players can't be downloaded.
 - **Facebook / Instagram**: public videos work from shared links and from the browser. Private or login-only posts need you
-  to sign in inside the QuickTube browser first.
+  to sign in inside the DUO browser first.
 - Not replicated: SnapTube's "Boost" and "Battery saver", which don't do anything real on modern Android, plus its ads and
   account sign-in. Storage clean, large files clean and the app uninstaller are implemented for real.
 - **Store policy**: Google Play and the App Store don't allow apps that download YouTube videos. Ship through other channels
@@ -174,5 +174,5 @@ turn that off in Settings → Privacy. Details in [PRIVACY.md](PRIVACY.md).
 
 ## License
 
-QuickTube is free software: you can redistribute it and/or modify it under the terms of the
+DUO is free software: you can redistribute it and/or modify it under the terms of the
 [GNU General Public License v3.0 or later](LICENSE).
