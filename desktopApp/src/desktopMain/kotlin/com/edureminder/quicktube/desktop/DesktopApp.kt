@@ -292,7 +292,6 @@ private fun Shell(nav: NavHostController, widthClass: WidthClass) {
                     onBack = { nav.popBackStack() },
                     onSearch = { q -> nav.navigate(SearchResultsRoute(q)) { popUpTo<SearchRoute> { inclusive = true } } },
                     onOpenUrl = ::openUrl,
-                    onViewSites = { nav.navigate(SitesRoute) },
                     onDownloadUrl = ::downloadUrl,
                 )
             }
