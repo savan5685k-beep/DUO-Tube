@@ -77,3 +77,9 @@ Production readiness is not declared.
 - Latest workflow-code commits 7534fc1d, aed2b23f, 458a30ca, and 26ac32b4 implement QA package separation, stable debug signing cache, and a pinned QA certificate. CI on aed2b23f passed; QA build/test/signature/package verification on 7534fc1d passed. The fingerprint-pin commits are awaiting their latest main CI/APK workflow results.
 - Last verified QA APK artifact is from 7534fc1d, artifact ID 15263584207. It contains three APKs; all signatures and `.qa` package IDs were verified and ZIP integrity passed. A build on the fingerprint-pinned latest main is still required before calling it the latest artifact.
 - Production readiness is not declared. Device QA and the WebView JavaScript-bridge security review remain outstanding.
+
+
+## User feedback iteration — 2026-11-28
+
+- User-rated current QA app 9/10 and reported a launch flash: Android system splash showed a dark background and app icon before the animated welcome. Android's system splash is platform-mandatory, so removed its drawable icon (transparent vector) to eliminate the unwanted logo flash; the welcome screen remains the app's own animation. This is a UI handoff improvement, not removal of the OS splash itself.
+- User's new requested backlog: persistent dismissed clipboard suggestion via right-swipe animation; advanced swipe-to-PiP and resizable PiP; background audio mode with thumbnail/headphones artwork and in-player return-to-video control; one tap Auto/double tap English/triple tap Hindi voice modes with append-to-existing-query behavior; crash investigation; repository-backed update checker and release workflow; in-app status photo/video viewer; status-owner display; move Status Saver to tab position 4 (next to Downloads). These are queued for scoped implementation and QA; no claim of completion yet.
