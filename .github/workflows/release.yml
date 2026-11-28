@@ -41,13 +41,21 @@ jobs:
           echo "name=$base.$code" >> "$GITHUB_OUTPUT"
           echo "Releasing $base.$code (versionCode $code)"
 
-      - name: Restore signing key and Firebase config
+      - name: Restore and validate release signing key and Firebase config
         env:
           RELEASE_KEYSTORE_BASE64: ${{ secrets.RELEASE_KEYSTORE_BASE64 }}
+          RELEASE_KEYSTORE_PASSWORD: ${{ secrets.RELEASE_KEYSTORE_PASSWORD }}
+          RELEASE_KEY_ALIAS: ${{ secrets.RELEASE_KEY_ALIAS }}
+          RELEASE_KEY_PASSWORD: ${{ secrets.RELEASE_KEY_PASSWORD }}
           GOOGLE_SERVICES_JSON: ${{ secrets.GOOGLE_SERVICES_JSON }}
         run: |
-          if [ -z "$RELEASE_KEYSTORE_BASE64" ]; then echo "::error::RELEASE_KEYSTORE_BASE64 secret is missing"; exit 1; fi
+          for name in RELEASE_KEYSTORE_BASE64 RELEASE_KEYSTORE_PASSWORD RELEASE_KEY_ALIAS RELEASE_KEY_PASSWORD; do
+            if [ -z "${!name}" ]; then echo "::error::$name secret is missing"; exit 1; fi
+          done
           echo "$RELEASE_KEYSTORE_BASE64" | base64 -d > "$RUNNER_TEMP/release.jks"
+          if ! keytool -list -keystore "$RUNNER_TEMP/release.jks" -storepass "$RELEASE_KEYSTORE_PASSWORD" -alias "$RELEASE_KEY_ALIAS" >/dev/null 2>&1; then
+            echo "::error::Release keystore/password/alias validation failed"; exit 1
+          fi
           echo "RELEASE_KEYSTORE_PATH=$RUNNER_TEMP/release.jks" >> "$GITHUB_ENV"
           if [ -n "$GOOGLE_SERVICES_JSON" ]; then
             printf '%s' "$GOOGLE_SERVICES_JSON" > app/google-services.json
