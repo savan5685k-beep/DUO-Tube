@@ -122,3 +122,13 @@ Production readiness is not declared.
 - The workflow's APK signature/package verification succeeded. No actual Android device installation or runtime QA has been performed in this session.
 - Source inspection for the next implementation task was blocked: GitHub repository code-search calls returned no matches, and GitHub tree/archive browsing is unavailable in this environment. No speculative source edit or code commit was made.
 - Next scope remains in-app WhatsApp Status media viewer, swipe-entry/resizable PiP, repository-backed release-check UX, and a review/remediation of the WebView JavaScript bridges. The bridge security review is not resolved; crash root cause is still not reproducible without device logs.
+
+
+## 2026-11-28 continuation
+
+- Status viewer work was added, but CI exposed a malformed state declaration in StatusSaverScreen.kt. It was corrected in commit 71b59c6c; the preceding failed build root cause was the missing closing brace on selectedStatus state, cascading into Compose context and syntax errors.
+- About-screen update action currently remains a direct GitHub Releases link; a true API version comparison is still pending and must be implemented with lifecycle-safe coroutine handling and tested.
+- Status viewer implementation is in progress; image/video rendering and save button need build and device verification.
+- Swipe-down mini-player transition remains pending; existing explicit PiP/floating player flow must be audited before changing gesture routing.
+- Crash investigation is not yet confirmed: no reproducible crash report/log has been provided; static review and QA can continue, but do not claim root cause without evidence.
+- Latest fix commit: 71b59c6cef08db1aa6fb1590810db64003609f34. CI/APK validation pending.
