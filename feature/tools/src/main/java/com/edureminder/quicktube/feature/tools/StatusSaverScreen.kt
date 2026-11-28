@@ -6,11 +6,15 @@ import com.edureminder.quicktube.core.designsystem.icon.BrandIcons
 import android.content.Intent
 import android.os.Build
 import android.widget.Toast
+import android.widget.VideoView
+import android.widget.MediaController
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.aspectRatio
@@ -25,6 +29,8 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.Dialog
+import androidx.compose.material3.Surface
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.PrimaryTabRow
 import androidx.compose.material3.Scaffold
@@ -34,8 +40,11 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.viewinterop.AndroidView
+import androidx.compose.ui.window.DialogProperties
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -61,6 +70,7 @@ fun StatusSaverScreen(onBack: () -> Unit) {
     val loading by vm.loading.collectAsStateWithLifecycle()
     val context = LocalContext.current
     var tab by remember { mutableIntStateOf(0) }
+    var selectedStatus by remember { mutableStateOf<StatusFile?>(null) 
     val picker = rememberLauncherForActivityResult(ActivityResultContracts.OpenDocumentTree()) { uri -> uri?.let(vm::onTreeGranted) }
     val readLauncher = rememberLauncherForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) { vm.refresh() }
     LaunchedEffect(Unit) {
@@ -101,18 +111,47 @@ fun StatusSaverScreen(onBack: () -> Unit) {
                 else LazyVerticalGrid(GridCells.Fixed(3), mod, contentPadding = PaddingValues(4.dp)) {
                     items(list, key = { it.uri.toString() }) { s ->
                         Box(Modifier.padding(4.dp).aspectRatio(0.75f).clip(RoundedCornerShape(10.dp)).background(MaterialTheme.colorScheme.surfaceVariant)
-                            .clickable {
-                                runCatching {
-                                    context.startActivity(Intent(Intent.ACTION_VIEW).setDataAndType(s.uri, if (s.isVideo) "video/*" else "image/*")
-                                        .addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION))
-                                }
-                            }) {
+                            .clickable { selectedStatus = s }) {
                             AsyncImage(s.uri, null, contentScale = ContentScale.Crop, modifier = Modifier.fillMaxSize())
                             if (s.isVideo) Icon(QtIcons.PlayCircle, null, tint = Color.White, modifier = Modifier.align(Alignment.Center).size(32.dp))
                             IconButton(
                                 onClick = { vm.save(s) { ok -> Toast.makeText(context, if (ok) "Saved to downloads" else "Couldn't save", Toast.LENGTH_SHORT).show() } },
                                 modifier = Modifier.align(Alignment.BottomEnd).padding(4.dp).size(36.dp).clip(CircleShape).background(MaterialTheme.colorScheme.primary),
                             ) { Icon(QtIcons.Download, "Save", tint = MaterialTheme.colorScheme.onPrimary, modifier = Modifier.size(20.dp)) }
+                        }
+                    }
+                }
+            }
+        }
+    }
+    selectedStatus?.let { status ->
+        Dialog(onDismissRequest = { selectedStatus = null }, properties = DialogProperties(usePlatformDefaultWidth = false, decorFitsSystemWindows = false)) {
+            Surface(color = Color.Black, modifier = Modifier.fillMaxSize()) {
+                Box(Modifier.fillMaxSize()) {
+                    if (status.isVideo) {
+                        AndroidView(
+                            modifier = Modifier.fillMaxSize(),
+                            factory = { ctx ->
+                                VideoView(ctx).apply {
+                                    setVideoURI(status.uri)
+                                    setMediaController(MediaController(ctx))
+                                    setOnPreparedListener { it.isLooping = true; start() }
+                                }
+                            },
+                        )
+                    } else {
+                        AsyncImage(status.uri, status.name, Modifier.fillMaxSize(), contentScale = ContentScale.Fit)
+                    }
+                    Row(
+                        Modifier.align(Alignment.TopStart).fillMaxWidth().background(Color.Black.copy(alpha = .5f)).padding(12.dp),
+                        horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically,
+                    ) {
+                        Column(Modifier.weight(1f)) {
+                            Text("WhatsApp Status", color = Color.White, style = MaterialTheme.typography.titleMedium)
+                            Text(status.name, color = Color.White.copy(alpha = .75f), style = MaterialTheme.typography.bodySmall)
+                        }
+                        IconButton(onClick = { selectedStatus = null }) {
+                            Icon(QtIcons.Close, "Close viewer", tint = Color.White)
                         }
                     }
                 }
