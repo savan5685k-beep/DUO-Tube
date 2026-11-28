@@ -120,6 +120,7 @@ dependencies {
     implementation(libs.coil.network.okhttp)
     implementation(libs.coil.video)
     implementation(libs.okhttp)
+    implementation("com.airbnb.android:lottie-compose:6.6.2")
 
     testImplementation(libs.junit)
     androidTestImplementation(platform(libs.androidx.compose.bom))
