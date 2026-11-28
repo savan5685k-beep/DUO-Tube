@@ -25,6 +25,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.AssistChip
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -70,6 +71,7 @@ fun SearchScreen(
     val suggestions by vm.suggestions.collectAsStateWithLifecycle()
     val recent by vm.recent.collectAsStateWithLifecycle()
     val focus = remember { FocusRequester() }
+    var voiceError by remember { mutableStateOf<String?>(null) }
     LaunchedEffect(Unit) { focus.requestFocus() }
     LaunchedEffect(field.text) { vm.query.value = field.text }
 
@@ -105,6 +107,10 @@ fun SearchScreen(
                 keyboardOptions = KeyboardOptions(imeAction = ImeAction.Search),
                 keyboardActions = KeyboardActions(onSearch = { submit(field.text) }),
             )
+            VoiceSearchControl(onResult = { text ->
+                field = TextFieldValue(text, TextRange(text.length))
+                submit(text)
+            }, onError = { voiceError = it })
             QtIconButton(QtIcons.Download, "Go", { submit(field.text) }, tint = MaterialTheme.colorScheme.onPrimary,
                 container = MaterialTheme.colorScheme.primary, modifier = Modifier.padding(start = 8.dp))
         }
@@ -157,6 +163,14 @@ fun SearchScreen(
                 }
             }
         }
+    }
+    voiceError?.let { message ->
+        AlertDialog(
+            onDismissRequest = { voiceError = null },
+            title = { Text("Voice search") },
+            text = { Text(message) },
+            confirmButton = { TextButton(onClick = { voiceError = null }) { Text("OK") } },
+        )
     }
 }
 
