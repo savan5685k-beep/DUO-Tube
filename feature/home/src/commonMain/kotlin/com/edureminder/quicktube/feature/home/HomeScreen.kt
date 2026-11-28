@@ -8,6 +8,7 @@ import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.background
+import androidx.compose.foundation.gestures.detectHorizontalDragGestures
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.rememberScrollState
@@ -283,7 +284,7 @@ private fun DiscoverTab(
                                 .background(MaterialTheme.colorScheme.primaryContainer)
                                 .pointerInput(url) {
                                     var swipeDistance = 0f
-                                    androidx.compose.foundation.gestures.detectHorizontalDragGestures(
+                                    detectHorizontalDragGestures(
                                         onHorizontalDrag = { _, delta -> swipeDistance += delta },
                                         onDragEnd = {
                                             if (swipeDistance > 100.dp.toPx()) {
