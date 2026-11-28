@@ -80,6 +80,35 @@ import kotlinx.coroutines.delay
 import org.koin.compose.koinInject
 import org.koin.compose.viewmodel.koinViewModel
 
+
+
+// DUO Safe Browsing: conservative adult-site block list and search-term guard.
+// This is a protective filter, not a complete internet-level parental control.
+private val DUO_BLOCKED_HOSTS = setOf(
+    "pornhub.com", "xvideos.com", "xnxx.com", "xhamster.com", "redtube.com",
+    "youporn.com", "tube8.com", "spankbang.com", "spankwire.com", "eporner.com",
+    "tnaflix.com", "beeg.com", "porntrex.com", "porn.com", "rule34.xxx",
+    "chaturbate.com", "stripchat.com", "livejasmin.com", "cam4.com", "myfreecams.com",
+    "onlyfans.com", "fansly.com", "manyvids.com", "nhentai.net", "hentaihaven.xxx",
+    "hanime.tv", "hentaistream.com"
+)
+private val DUO_BLOCKED_TERMS = Regex(
+    "(?i)(\\b(porn|porno|pornography|xxx|sexcam|webcamsex|hentai|rule34|nsfw|adultcontent|erotic)\\b)"
+)
+private fun duoBlockedUrl(raw: String): Boolean {
+    val uri = runCatching { Uri.parse(raw) }.getOrNull() ?: return false
+    val host = uri.host?.lowercase()?.removePrefix("www.") ?: return false
+    val hostBlocked = DUO_BLOCKED_HOSTS.any { host == it || host.endsWith(".$it") }
+    val textBlocked = DUO_BLOCKED_TERMS.containsMatchIn(raw)
+    return hostBlocked || textBlocked
+}
+private fun duoBlockResponse(): WebResourceResponse = WebResourceResponse(
+    "text/html", "UTF-8", 403, "Blocked by DUO Safe Browsing",
+    mapOf("Cache-Control" to "no-store"), java.io.ByteArrayInputStream(
+        """<!doctype html><meta charset="utf-8"><meta name="viewport" content="width=device-width"><title>Blocked</title><body style="font-family:sans-serif;background:#111;color:#eee;padding:24px"><h2>DUO Safe Browsing</h2><p>This page or request was blocked because it may contain adult content.</p><p>Safe browsing protection is enabled.</p></body>""".toByteArray(Charsets.UTF_8)
+    )
+)
+
 private val YT_WATCH = Regex("""youtube\.com/(watch\?|shorts/)|youtu\.be/""")
 
 /**
@@ -274,7 +303,7 @@ fun BrowserScreen(
                         keyboardOptions = KeyboardOptions(imeAction = ImeAction.Go),
                         keyboardActions = KeyboardActions(onGo = {
                             val t = address.text.trim()
-                            webView?.loadUrl(if (Urls.looksLikeUrl(t)) Urls.normalize(t) else Urls.googleSearch(t))
+                            webView?.loadUrl(if (Urls.looksLikeUrl(t)) Urls.normalize(t) else Urls.googleSearch(t).let { if (it.contains("?")) "$it&safe=active" else "$it?safe=active" })
                             editing = false
                         }),
                     )
@@ -339,7 +368,7 @@ fun BrowserScreen(
                     WebView(ctx).apply {
                         layoutParams = ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT)
                         applyBrowserSettings()
-                        settings.mediaPlaybackRequiresUserGesture = false
+                        settings.safeBrowsingEnabled = true\n                        settings.mediaPlaybackRequiresUserGesture = false
                         settings.loadWithOverviewMode = true
                         settings.useWideViewPort = true
                         settings.builtInZoomControls = true
