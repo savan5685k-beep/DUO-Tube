@@ -104,13 +104,14 @@ class HomeActions(
     val openSites: () -> Unit,
     val openLibrary: () -> Unit = {},
     val openVault: () -> Unit = {},
+    val openStatusSaver: () -> Unit = {},
     val openBulk: () -> Unit = {},
     val openSubscriptions: () -> Unit = {},
     val openPlaylists: (music: Boolean) -> Unit = {},
     val openLocalPlaylist: (Long) -> Unit = {},
 )
 
-private val tabs = listOf("Search", "YouTube", "Music", "More")
+private val tabs = listOf("Search", "YouTube", "Music", "WhatsApp Saver")
 
 @Composable
 fun HomeScreen(actions: HomeActions, modifier: Modifier = Modifier) {
