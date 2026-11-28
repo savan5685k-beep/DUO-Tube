@@ -6,7 +6,6 @@ import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.expandVertically
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
-import androidx.compose.animation.shrinkVertically
 import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.detectHorizontalDragGestures
@@ -204,6 +203,9 @@ private fun DiscoverTab(
     val ex = LocalQtExtras.current
     val sheet = koinInject<DownloadSheetController>()
     val settingsStore = koinInject<com.edureminder.quicktube.core.datastore.SettingsDataSource>()
+    val scope = rememberCoroutineScope()
+    val clipboardRevision = com.edureminder.quicktube.core.ui.rememberClipboardRevision()
+    var lastClipboardRevision by remember { mutableStateOf(clipboardRevision) }
     val feed by vm.feed.collectAsStateWithLifecycle()
     val showTrending by vm.showTrending.collectAsStateWithLifecycle()
     var clip by remember { mutableStateOf<String?>(null) }
@@ -212,15 +214,17 @@ private fun DiscoverTab(
     // ON_RESUME, so read it whenever focus arrives (coming back from another app included).
     val focused = androidx.compose.ui.platform.LocalWindowInfo.current.isWindowFocused
     // Only links DUO can download are offered (a copied GitHub or news link isn't).
-    LaunchedEffect(focused) { if (focused) {
+    LaunchedEffect(focused, clipboardRevision) { if (focused) {
         val storedDismissed = settingsStore.dismissedClipboardUrl()
         dismissedClipboard = storedDismissed
+        val copiedAgain = clipboardRevision != lastClipboardRevision
         val candidate = Urls.extractUrl(readClipboard())?.takeIf(vm::canDownload)
-        clip = candidate?.takeUnless { it == storedDismissed }
-        if (candidate != null && candidate != storedDismissed) {
+        clip = candidate?.takeIf { it != storedDismissed || copiedAgain }
+        if (candidate != null && (candidate != storedDismissed || copiedAgain)) {
             dismissedClipboard = null
             settingsStore.setDismissedClipboardUrl(null)
         }
+        lastClipboardRevision = clipboardRevision
     } }
     val list = rememberLazyListState()
 
