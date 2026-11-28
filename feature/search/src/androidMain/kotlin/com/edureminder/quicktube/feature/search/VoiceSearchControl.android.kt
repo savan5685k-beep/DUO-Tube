@@ -16,6 +16,7 @@ import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Icon
@@ -141,17 +142,15 @@ actual fun VoiceSearchControl(
         AlertDialog(
             onDismissRequest = { showLanguageDialog = false },
             title = { Text("Voice search language") },
-            text = { Text("Choose a language for recognition. Auto uses supported automatic detection or your device's recognition language.") },
-            confirmButton = {
-                TextButton(onClick = {
-                    showLanguageDialog = false
-                    requestedLanguage = "auto"
-                    if (context.checkSelfPermission(Manifest.permission.RECORD_AUDIO) == PackageManager.PERMISSION_GRANTED) startRecognition("auto")
-                    else permissionLauncher.launch(Manifest.permission.RECORD_AUDIO)
-                }) { Text("Auto") }
-            },
-            dismissButton = {
-                Row {
+            text = {
+                Column {
+                    Text("Choose a language. Auto uses supported automatic detection or your device's recognition language.")
+                    TextButton(onClick = {
+                        showLanguageDialog = false
+                        requestedLanguage = "auto"
+                        if (context.checkSelfPermission(Manifest.permission.RECORD_AUDIO) == PackageManager.PERMISSION_GRANTED) startRecognition("auto")
+                        else permissionLauncher.launch(Manifest.permission.RECORD_AUDIO)
+                    }) { Text("Auto") }
                     TextButton(onClick = {
                         showLanguageDialog = false
                         requestedLanguage = "hi-IN"
@@ -165,6 +164,9 @@ actual fun VoiceSearchControl(
                         else permissionLauncher.launch(Manifest.permission.RECORD_AUDIO)
                     }) { Text("English") }
                 }
+            },
+            confirmButton = {
+                TextButton(onClick = { showLanguageDialog = false }) { Text("Cancel") }
             },
         )
     }
