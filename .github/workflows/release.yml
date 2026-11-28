@@ -81,7 +81,7 @@ jobs:
 
       - name: Verify signatures and collect the APKs
         env:
-          EXPECTED_CERT_SHA256: 45f117b4c36b2c5c9592a50faa5c572c2415d7b3d25d0f4ea19eda980b5dc8c
+          EXPECTED_CERT_SHA256: 45f117b4c36b2c5c9592a50faa5c572c2415d7b3d25d0f4ea19eda980b5dc88c
         run: |
           dir=app/build/outputs/apk/release
           ls -la "$dir"
