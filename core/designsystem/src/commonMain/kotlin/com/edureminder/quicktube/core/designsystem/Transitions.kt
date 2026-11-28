@@ -43,6 +43,12 @@ object QtTransitions {
      * Bottom-tab switches are instant (as in SnapTube); the nav bar's sliding pill carries the motion.
      * A full-screen fade would force an off-screen layer every frame, which budget GPUs can't afford at 90 Hz.
      */
-    val tabEnter: AnimatedContentTransitionScope<NavBackStackEntry>.() -> EnterTransition = { EnterTransition.None }
-    val tabExit: AnimatedContentTransitionScope<NavBackStackEntry>.() -> ExitTransition = { ExitTransition.None }
+    val tabEnter: AnimatedContentTransitionScope<NavBackStackEntry>.() -> EnterTransition = {
+        fadeIn(tween(150, easing = QtEasing.Standard)) +
+            slideInHorizontally(tween(150, easing = QtEasing.EmphasizedDecelerate)) { it / 36 }
+    }
+    val tabExit: AnimatedContentTransitionScope<NavBackStackEntry>.() -> ExitTransition = {
+        fadeOut(tween(110, easing = QtEasing.Standard)) +
+            slideOutHorizontally(tween(110, easing = QtEasing.EmphasizedAccelerate)) { -it / 48 }
+    }
 }
