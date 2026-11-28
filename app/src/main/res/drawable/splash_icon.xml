@@ -4,6 +4,6 @@
     android:height="108dp"
     android:viewportWidth="108"
     android:viewportHeight="108">
-    <!-- Deliberately transparent: Android's mandatory launch splash should not show
-         a second logo before DUO's animated welcome screen. -->
+    <!-- Transparent artwork suppresses the icon flash on Android's mandatory system splash. -->
+    <path android:fillColor="#00000000" android:pathData="M0,0 H108 V108 H0 Z"/>
 </vector>
