@@ -348,7 +348,7 @@ fun BrowserScreen(
                             onClick = { menu = false; onOpenBookmarks() })
                         DropdownMenuItem(text = { Text("History") }, leadingIcon = { Icon(QtIcons.History, null) },
                             onClick = { menu = false; onOpenHistory() })
-                        DropdownMenuItem(text = { Text("Clear website data") }, leadingIcon = { Icon(QtIcons.Delete, null) }, onClick = { menu = false; showClearWebsiteData = true })
+                        DropdownMenuItem(text = { Text("Clear website data") }, leadingIcon = { Icon(QtIcons.Lock, null) }, onClick = { menu = false; showClearWebsiteData = true })
                         DropdownMenuItem(text = { Text("Copy link") }, leadingIcon = { Icon(QtIcons.ContentCopy, null) }, onClick = {
                             context.getSystemService(ClipboardManager::class.java).setPrimaryClip(ClipData.newPlainText("url", ui.url))
                             menu = false
