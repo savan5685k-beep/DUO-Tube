@@ -63,11 +63,19 @@ class SettingsDataSource(private val dataStore: DataStore<Preferences>, val defa
         val autoplayNext = booleanPreferencesKey("autoplay_next")
         val showTrending = booleanPreferencesKey("show_trending")
         val captionStyle = stringPreferencesKey("caption_style")
+        val dismissedClipboardUrl = stringPreferencesKey("dismissed_clipboard_url")
     }
 
     val settings: Flow<AppSettings> = dataStore.data.map(::settingsFrom)
 
     suspend fun current(): AppSettings = settings.first()
+
+    /** Persist a dismissed clipboard suggestion across app restarts. */
+    suspend fun dismissedClipboardUrl(): String? = dataStore.data.first()[K.dismissedClipboardUrl]
+
+    suspend fun setDismissedClipboardUrl(url: String?) {
+        dataStore.edit { p -> if (url == null) p.remove(K.dismissedClipboardUrl) else p[K.dismissedClipboardUrl] = url }
+    }
 
     suspend fun update(transform: (AppSettings) -> AppSettings) {
         dataStore.edit { p ->
