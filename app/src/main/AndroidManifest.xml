@@ -74,7 +74,7 @@
             android:label="@string/share_label"
             android:theme="@style/Theme.QuickTube.Share"
             android:excludeFromRecents="true"
-            android:taskAffinity="com.edureminder.quicktube.share"
+            android:taskAffinity="${applicationId}.share"
             android:launchMode="singleTask"
             android:noHistory="false">
             <intent-filter android:label="@string/share_label">
