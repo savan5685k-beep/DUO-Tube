@@ -4,7 +4,7 @@ Updated: 2026-11-28
 
 ## Current main
 
-- SHA: 896b890a5421be02a65b8037105da388084f8ce4
+- SHA: d57cc6cf56c02d385af306ca274a810066cb8864
 - Current main includes the branding, voice-search, privacy, security, search-suggestion, and download-flow changes plus a test fix for DUO metadata.
 
 ## Implemented
@@ -30,8 +30,11 @@ Updated: 2026-11-28
 - 68f7ebd5 — subscriptions/playlists UI changes; mirror succeeded, APK build was still in progress.
 - 3e2c7688 — tab-transition refinement; mirror succeeded, CI/APK were in progress.
 - b1f4a96b — latest main before this iteration: APK compile succeeded, but 2 desktop tests failed in `:core:download:desktopTest` (`AudioTagsTest.videoWithHeaderAtTheEndIsBrandedInPlace` and `mp3GetsTheBrandingFrames`). Log root cause: test assertions still hard-coded the legacy `edureminder.com` branding while implementation uses `Branding.URL` and `Branding.APP` for DUO.
-- a8872fc6 — updated AudioTags tests to assert against the shared DUO branding constants (`Branding.APP`, `Branding.URL`), rather than obsolete domain text. Tests/build are pending on this commit; no pass is claimed.
-- The latest APK artifact has not been verified or promoted as a QA download.
+- a8872fc6 / 79fff8b9 — corrected AudioTags branding expectations to use the shared DUO constants instead of legacy domain text.
+- d57cc6cf — fixed the remaining CI compilation error by importing shared `Branding` in the desktop test file.
+- CI run 46140412771 on d57cc6cf: **passed**. Debug APK build and unit tests both succeeded; test-report upload was skipped because no failure report was needed.
+- APK workflow 46140412687 on the same SHA: **passed**. Build, unit tests, and APK artifact upload succeeded.
+- Artifact `DUO-debug-apk` (ID 15261108167) was downloaded and verified. ZIP test passed; it contains universal, arm64-v8a, and armeabi-v7a debug APKs. Artifact SHA-256: `9c36d0fa204b2812cb1cb0716ca3fca563e5921eb6d99f2ba7b0acfb56346565`. Universal APK ZIP integrity test passed; SHA-256: `e5f264cdf93818738b9239ff469351235218760bbd2786153b0f8e90b00bd74e`. This is a debug QA build, not a release-signed production APK.
 
 ## Privacy and security audit
 
