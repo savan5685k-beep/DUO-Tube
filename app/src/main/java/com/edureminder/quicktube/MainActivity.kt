@@ -27,6 +27,10 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import com.airbnb.lottie.compose.LottieAnimation
+import com.airbnb.lottie.compose.LottieCompositionSpec
+import com.airbnb.lottie.compose.rememberLottieComposition
+import com.airbnb.lottie.compose.animateLottieCompositionAsState
 import androidx.compose.runtime.remember
 import kotlinx.coroutines.delay
 import com.edureminder.quicktube.core.playerui.PipState
@@ -71,7 +75,7 @@ class MainActivity : ComponentActivity() {
             var showWelcome by remember { mutableStateOf(savedInstanceState == null) }
             LaunchedEffect(Unit) {
                 if (showWelcome) {
-                    delay(1600)
+                    delay(2600)
                     showWelcome = false
                 }
             }
@@ -161,7 +165,9 @@ private fun WelcomeScreen() {
         contentAlignment = Alignment.Center,
     ) {
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
-            Image(painterResource(com.edureminder.quicktube.R.drawable.splash_icon), contentDescription = "DUO Tube logo", modifier = Modifier.size(128.dp))
+            val composition by rememberLottieComposition(LottieCompositionSpec.RawRes(com.edureminder.quicktube.R.raw.resso))
+            val progress by animateLottieCompositionAsState(composition, iterations = 1)
+            LottieAnimation(composition = composition, progress = { progress }, modifier = Modifier.size(160.dp))
             Text("Welcome to DUO Tube", style = MaterialTheme.typography.headlineSmall, modifier = Modifier.padding(top = 20.dp))
             Text("Your media, with privacy in mind", style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant, modifier = Modifier.padding(top = 8.dp))
         }
