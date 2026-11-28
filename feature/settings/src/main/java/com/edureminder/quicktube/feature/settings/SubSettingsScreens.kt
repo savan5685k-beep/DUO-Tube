@@ -209,10 +209,22 @@ fun AboutScreen(onBack: () -> Unit) {
                     "Share supported media links with DUO Tube to save them locally.",
                 textAlign = TextAlign.Center, modifier = Modifier.padding(vertical = 24.dp),
             )
-            Text("Open-source software", style = MaterialTheme.typography.titleSmall)
+            Text("Developer", style = MaterialTheme.typography.titleSmall)
+            Text("Shavan", style = MaterialTheme.typography.titleMedium, modifier = Modifier.padding(top = 4.dp))
+            Text("Independent developer · Student project", textAlign = TextAlign.Center,
+                color = MaterialTheme.colorScheme.onSurfaceVariant, style = MaterialTheme.typography.bodySmall)
+            Text("AI-assisted development: OpenAI ChatGPT", textAlign = TextAlign.Center,
+                color = MaterialTheme.colorScheme.onSurfaceVariant, style = MaterialTheme.typography.bodySmall,
+                modifier = Modifier.padding(top = 4.dp))
+            Text("Copyright © 2026 Shavan", style = MaterialTheme.typography.bodySmall,
+                modifier = Modifier.padding(top = 12.dp))
+            Text("License & acknowledgements", style = MaterialTheme.typography.titleSmall,
+                modifier = Modifier.padding(top = 20.dp))
             Text(
-                "NewPipe Extractor (GPLv3) · AndroidX Media3, Room, Navigation, DataStore (Apache 2.0) · Koin (Apache 2.0) · " +
-                    "Coil (Apache 2.0) · OkHttp (Apache 2.0) · Kotlin Coroutines & Serialization (Apache 2.0)",
+                "DUO Tube is distributed under GNU GPL v3.0 (see the project LICENSE file). " +
+                    "NewPipe Extractor (GPLv3) · AndroidX Media3, Room, Navigation, DataStore (Apache 2.0) · Koin (Apache 2.0) · " +
+                    "Coil (Apache 2.0) · OkHttp (Apache 2.0) · Kotlin Coroutines & Serialization (Apache 2.0). " +
+                    "Third-party names and trademarks belong to their respective owners.",
                 textAlign = TextAlign.Center, style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant, modifier = Modifier.fillMaxWidth().padding(top = 8.dp),
             )
