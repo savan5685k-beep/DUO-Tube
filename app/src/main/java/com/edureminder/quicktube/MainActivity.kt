@@ -27,6 +27,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import kotlinx.coroutines.delay
 import com.edureminder.quicktube.core.playerui.PipState
 import androidx.compose.runtime.LaunchedEffect
