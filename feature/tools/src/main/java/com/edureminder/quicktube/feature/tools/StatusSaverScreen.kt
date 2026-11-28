@@ -70,7 +70,7 @@ fun StatusSaverScreen(onBack: () -> Unit) {
     val loading by vm.loading.collectAsStateWithLifecycle()
     val context = LocalContext.current
     var tab by remember { mutableIntStateOf(0) }
-    var selectedStatus by remember { mutableStateOf<StatusFile?>(null) 
+    var selectedStatus by remember { mutableStateOf<StatusFile?>(null) }
     val picker = rememberLauncherForActivityResult(ActivityResultContracts.OpenDocumentTree()) { uri -> uri?.let(vm::onTreeGranted) }
     val readLauncher = rememberLauncherForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) { vm.refresh() }
     LaunchedEffect(Unit) {
