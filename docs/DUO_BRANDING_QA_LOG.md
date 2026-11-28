@@ -22,3 +22,12 @@
 
 - Review cleartext HTTP support, JavaScript bridges, and exported MediaSession access.
 - Device QA: voice recognition, permission denial/grant, Status Saver, downloads, browser, PiP, and UI.
+
+
+## Iteration 3 — Install conflict and signing stability (2026-11-28)
+
+- Reproduced the reported installer message conceptually from the package/signing workflow: debug APKs were built under the production package ID and can be signed by runner-local debug certificates that change between CI runs. A debug APK cannot update a release-signed installation.
+- Main and manual QA workflows now build the optimized `qa` variant with package suffix `.qa`, restore a dedicated cached debug key, serialize builds, and verify APK signature plus package ID.
+- Verified certificate SHA-256: `491877412845f1874c2003b9ebc0db3895859d0c95f1421a36be3344efc99862`. Workflow commits pin this fingerprint to fail if signing-key cache is lost or rotated.
+- QA run 46146198322 on commit 7534fc1d passed build, signature/package verification, unit tests, and artifact upload. Artifact ID 15263584207 (ZIP SHA-256 `6833c32b3ad93a2d33dc7676eb2d7cc76a59fb2467219a92f4453c582d5df362`) contains arm64, arm32, and universal QA APKs. ZIP integrity passed after download.
+- The fingerprint-pinning commits and the progress-document update are awaiting validation on the newest main SHA. Device installation/update testing is still required.
