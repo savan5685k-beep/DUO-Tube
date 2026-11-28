@@ -28,4 +28,8 @@ object AdultContentFilter {
         Regex("%([0-9a-fA-F]{2})").replace(text) { match ->
             match.groupValues[1].toInt(16).toChar().toString()
         }.replace('+', ' ')
+
+    /** Filters search-result metadata only; it does not inspect thumbnails or video frames. */
+    fun filterMediaItems(items: List<MediaItem>): List<MediaItem> =
+        items.filterNot { isBlockedText(it.title) || isBlockedText(it.uploader) || isBlockedText(it.url) }
 }

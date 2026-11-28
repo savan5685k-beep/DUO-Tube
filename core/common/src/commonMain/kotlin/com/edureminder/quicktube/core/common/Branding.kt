@@ -1,6 +1,6 @@
 package com.edureminder.quicktube.core.common
 
-/** What QuickTube writes into saved files: the end of every file name, and the files' description / tags. */
+/** DUO branding written into saved file names, descriptions, tags, and encoder metadata. */
 object Branding {
     const val APP = "DUO Tube"
     const val DOMAIN = "DUO"

@@ -26,7 +26,7 @@ class SearchViewModel(
     val query = MutableStateFlow("")
     val recent = history.recent.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
     val suggestions: StateFlow<List<String>> = query.debounce(200).distinctUntilChanged().mapLatest { q ->
-        if (q.isBlank() || AdultContentFilter.isBlockedText(q)) emptyList() else runCatching { media.suggestions(q) }.getOrDefault(emptyList())
+        if (q.isBlank() || AdultContentFilter.isBlockedText(q)) emptyList() else runCatching { media.suggestions(q).filterNot { AdultContentFilter.isBlockedText(it) } }.getOrDefault(emptyList())
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
 
     val hot = listOf("Top hits", "Trending songs", "Lofi", "Workout music", "Cartoon", "Natok", "Cricket highlights", "Taylor Swift")
@@ -64,7 +64,7 @@ class SearchResultsViewModel(private val media: MediaRepository) : ViewModel() {
         _ui.value = ResultsUi(filter = filter, loading = true)
         viewModelScope.launch {
             runCatching { media.search(query, filter) }
-                .onSuccess { p -> if (_ui.value.filter == filter) _ui.value = ResultsUi(filter, p.items.distinctBy { it.url }, false, nextPage = p.nextPage) }
+                .onSuccess { p -> if (_ui.value.filter == filter) _ui.value = ResultsUi(filter, AdultContentFilter.filterMediaItems(p.items).distinctBy { it.url }, false, nextPage = p.nextPage) }
                 .onFailure { e -> if (_ui.value.filter == filter) _ui.value = ResultsUi(filter, loading = false, error = e.message ?: "Search failed") }
         }
     }
@@ -75,7 +75,7 @@ class SearchResultsViewModel(private val media: MediaRepository) : ViewModel() {
         _ui.update { it.copy(loadingMore = true) }
         viewModelScope.launch {
             runCatching { media.search(query, s.filter, s.nextPage) }
-                .onSuccess { p -> _ui.update { it.copy(items = (it.items + p.items).distinctBy { i -> i.url }, nextPage = p.nextPage, loadingMore = false) } }
+                .onSuccess { p -> _ui.update { it.copy(items = (it.items + AdultContentFilter.filterMediaItems(p.items)).distinctBy { i -> i.url }, nextPage = p.nextPage, loadingMore = false) } }
                 .onFailure { _ui.update { it.copy(loadingMore = false, nextPage = null) } }
         }
     }

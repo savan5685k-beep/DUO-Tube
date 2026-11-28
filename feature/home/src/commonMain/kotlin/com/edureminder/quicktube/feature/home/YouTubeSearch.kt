@@ -116,7 +116,7 @@ class YouTubeSearchViewModel(
     val typed = MutableStateFlow("")
     val recent = history.recent.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
     val suggestions: StateFlow<List<String>> = typed.debounce(200).distinctUntilChanged().mapLatest { q ->
-        if (q.isBlank() || AdultContentFilter.isBlockedText(q)) emptyList() else runCatching { media.suggestions(q) }.getOrDefault(emptyList())
+        if (q.isBlank() || AdultContentFilter.isBlockedText(q)) emptyList() else runCatching { media.suggestions(q).filterNot { AdultContentFilter.isBlockedText(it) } }.getOrDefault(emptyList())
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
 
     private val _ui = MutableStateFlow(YtSearchUi())
@@ -136,7 +136,7 @@ class YouTubeSearchViewModel(
         _ui.value = YtSearchUi(query = q, filter = filter, loading = true)
         job = viewModelScope.launch {
             runCatching { media.search(q, filter) }
-                .onSuccess { p -> _ui.value = YtSearchUi(q, filter, p.items.distinctBy { it.url }, nextPage = p.nextPage) }
+                .onSuccess { p -> _ui.value = YtSearchUi(q, filter, AdultContentFilter.filterMediaItems(p.items).distinctBy { it.url }, nextPage = p.nextPage) }
                 .onFailure { e -> _ui.value = YtSearchUi(q, filter, error = e.message ?: "Search failed") }
         }
     }
@@ -153,7 +153,7 @@ class YouTubeSearchViewModel(
         _ui.update { it.copy(loadingMore = true) }
         job = viewModelScope.launch {
             runCatching { media.search(q, s.filter, s.nextPage) }
-                .onSuccess { p -> _ui.update { it.copy(items = (it.items + p.items).distinctBy { i -> i.url }, nextPage = p.nextPage, loadingMore = false) } }
+                .onSuccess { p -> _ui.update { it.copy(items = (it.items + AdultContentFilter.filterMediaItems(p.items)).distinctBy { i -> i.url }, nextPage = p.nextPage, loadingMore = false) } }
                 .onFailure { _ui.update { it.copy(loadingMore = false, nextPage = null) } }
         }
     }
