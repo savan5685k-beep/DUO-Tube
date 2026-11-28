@@ -14,7 +14,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.edureminder.quicktube.core.designsystem.PillButton
 import com.edureminder.quicktube.core.designsystem.icon.BrandIcons
-import com.edureminder.quicktube.core.designsystem.QtCard
 
 @Composable
 internal fun MoreTab(actions: HomeActions) {
