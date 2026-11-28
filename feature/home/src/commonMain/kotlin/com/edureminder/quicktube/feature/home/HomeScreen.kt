@@ -7,6 +7,7 @@ import androidx.compose.animation.expandVertically
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.shrinkVertically
+import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.detectHorizontalDragGestures
 import androidx.compose.ui.input.pointer.pointerInput
@@ -202,6 +203,7 @@ private fun DiscoverTab(
     val readClipboard = com.edureminder.quicktube.core.ui.rememberClipboardReader()
     val ex = LocalQtExtras.current
     val sheet = koinInject<DownloadSheetController>()
+    val settingsStore = koinInject<com.edureminder.quicktube.core.datastore.SettingsDataSource>()
     val feed by vm.feed.collectAsStateWithLifecycle()
     val showTrending by vm.showTrending.collectAsStateWithLifecycle()
     var clip by remember { mutableStateOf<String?>(null) }
@@ -211,9 +213,14 @@ private fun DiscoverTab(
     val focused = androidx.compose.ui.platform.LocalWindowInfo.current.isWindowFocused
     // Only links DUO can download are offered (a copied GitHub or news link isn't).
     LaunchedEffect(focused) { if (focused) {
+        val storedDismissed = settingsStore.dismissedClipboardUrl()
+        dismissedClipboard = storedDismissed
         val candidate = Urls.extractUrl(readClipboard())?.takeIf(vm::canDownload)
-        clip = candidate?.takeUnless { it == dismissedClipboard }
-        if (candidate != null && candidate != dismissedClipboard) dismissedClipboard = null
+        clip = candidate?.takeUnless { it == storedDismissed }
+        if (candidate != null && candidate != storedDismissed) {
+            dismissedClipboard = null
+            settingsStore.setDismissedClipboardUrl(null)
+        }
     } }
     val list = rememberLazyListState()
 
@@ -277,7 +284,7 @@ private fun DiscoverTab(
                             Icon(QtIcons.Download, "Download", tint = MaterialTheme.colorScheme.onPrimary, modifier = Modifier.size(22.dp))
                         }
                     }
-                    AnimatedVisibility(clip != null, enter = fadeIn() + expandVertically(), exit = fadeOut() + shrinkVertically()) {
+                    AnimatedVisibility(clip != null, enter = fadeIn() + expandVertically(), exit = fadeOut() + slideOutHorizontally { fullWidth -> fullWidth }) {
                         val url = clip.orEmpty()
                         Row(
                             Modifier.padding(top = 14.dp).fillMaxWidth().clip(RoundedCornerShape(20.dp))
@@ -289,6 +296,7 @@ private fun DiscoverTab(
                                         onDragEnd = {
                                             if (swipeDistance > 100.dp.toPx()) {
                                                 dismissedClipboard = url
+                                                scope.launch { settingsStore.setDismissedClipboardUrl(url) }
                                                 clip = null
                                             }
                                             swipeDistance = 0f
