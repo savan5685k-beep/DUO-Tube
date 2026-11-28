@@ -36,11 +36,6 @@ android {
         versionCode = (project.findProperty("appVersionCode") as String?)?.toInt() ?: 1
         versionName = (project.findProperty("appVersionName") as String?) ?: "${project.property("appVersionBase")}.0-dev"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
-        // Where the app looks for new versions. Override with -PupdateApiUrl=… to test against a local fake release.
-        val updateUrl = (project.findProperty("updateApiUrl") as String?)
-            ?: "https://api.github.com/repos/savan5685k-beep/DUO-Tube/releases/latest"
-        buildConfigField("String", "UPDATE_API_URL", "\"$updateUrl\"")
-        buildConfigField("boolean", "UPDATE_URL_OVERRIDDEN", "${project.hasProperty("updateApiUrl")}")
         // Phones only (the bundled Python is per-ABI); keeps the APK small.
         ndk { abiFilters += setOf("arm64-v8a", "armeabi-v7a") }
     }
@@ -65,7 +60,7 @@ android {
     buildFeatures { buildConfig = true }
 
     // One APK per CPU type (each ~35% smaller: the bundled Python runtime is per-ABI), plus a universal one.
-    // The in-app updater downloads the one matching the phone; the universal APK stays for manual installs.
+    // The universal APK is included for convenient manual installation.
     splits {
         abi {
             isEnable = true
@@ -101,7 +96,6 @@ dependencies {
     implementation(projects.core.downloadsheet)
     implementation(projects.core.ytdlp)
     implementation(projects.core.analytics)
-    implementation(projects.core.update)
 
     implementation(projects.feature.home)
     implementation(projects.feature.search)
