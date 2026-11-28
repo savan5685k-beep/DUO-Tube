@@ -58,7 +58,7 @@ class AudioTagsTest {
         val b = f.readBytes()
         // Media data didn't move; the header now carries the branding.
         assertArrayEquals(ftyp + mdat, b.copyOfRange(0, ftyp.size + mdat.size))
-        for (tag in listOf("©cmt", "©too", "keyw", "purl", "edureminder.com")) assertTrue(tag, find(b, tag) > 0)
+        for (tag in listOf("©cmt", "©too", "keyw", "purl", Branding.APP, Branding.URL)) assertTrue(tag, find(b, tag) > 0)
         assertEquals(-1, find(b, ".tag"))
     }
 
@@ -66,7 +66,7 @@ class AudioTagsTest {
     fun mp3GetsTheBrandingFrames() {
         val tag = AudioTags.id3(AudioTags.Tags("Song", null, null))
         for (frame in listOf("COMM", "TENC", "TPUB", "TXXX", "WXXX")) assertTrue(frame, find(tag, frame) > 0)
-        assertTrue(find(tag, "https://edureminder.com") > 0)
+        assertTrue(find(tag, Branding.URL) > 0)
     }
 
     @Test
