@@ -4,7 +4,7 @@ This checklist records the release blockers identified during a repository audit
 
 ## Release blockers
 
-- [ ] **Unique Android application identity:** `app/build.gradle.kts` still uses `com.edureminder.quicktube`. Choose and migrate to a DUO-owned application ID before the first public DUO release. Audit manifest authorities, task affinities, deep links, updater identity, and package references as part of the migration.
+- [x] **Unique Android application identity:** application ID migrated to `com.savan5685k.duo`; manifest share-task affinity now uses `${applicationId}.share`. Kotlin namespace/source packages remain under the upstream namespace to avoid a risky mass source refactor. The app is now a separate install identity from upstream.
 - [ ] **Release signing secrets:** GitHub Actions needs `RELEASE_KEYSTORE_BASE64`, `RELEASE_KEYSTORE_PASSWORD`, `RELEASE_KEY_ALIAS`, and `RELEASE_KEY_PASSWORD`. Do not publish until the key is securely backed up and the actual certificate fingerprint is verified.
 - [ ] **Pinned certificate:** `release.yml` currently pins SHA-256 `b5fb3a7defdc7a3e0c0d6c3b468bc6353cd22225bbfee0585d7f337667aeb87a`. Confirm this matches the real DUO release key before production use. Never replace it with an unverified value.
 - [ ] **Network policy:** The manifest currently sets `android:usesCleartextTraffic="true"`. Review HTTP support and decide on a production network-security policy. The built-in browser's HTTP support means this cannot be changed blindly without testing.
