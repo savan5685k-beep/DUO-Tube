@@ -48,6 +48,8 @@ import java.text.DateFormat
 import java.util.Date
 
 @Composable
+private val allowedBuiltInSites = setOf("YouTube", "YouTube Web", "Instagram", "Facebook")
+
 fun SiteIcon(name: String, url: String = name) {
     BrandTile(if (brandFor(name) != null) name else url, size = 46.dp, label = name)
 }
@@ -56,6 +58,7 @@ fun SiteIcon(name: String, url: String = name) {
 fun SitesScreen(onBack: () -> Unit, onOpen: (String) -> Unit, onHistory: () -> Unit) {
     val vm = koinViewModel<SitesViewModel>()
     val sites by vm.sites.collectAsStateWithLifecycle()
+    val visibleSites = remember(sites) { sites.filter { !it.builtIn || it.name in allowedBuiltInSites } }
     var deleting by remember { mutableStateOf<Set<Long>?>(null) }
     var adding by remember { mutableStateOf(false) }
     Scaffold(topBar = {
@@ -69,8 +72,8 @@ fun SitesScreen(onBack: () -> Unit, onOpen: (String) -> Unit, onHistory: () -> U
         }
     }) { pad ->
         LazyColumn(Modifier.fillMaxSize().padding(pad)) {
-            items(sites.size) { i ->
-                val s = sites[i]
+            items(visibleSites.size) { i ->
+                val s = visibleSites[i]
                 Row(
                     Modifier.fillMaxWidth().clickable {
                         val d = deleting

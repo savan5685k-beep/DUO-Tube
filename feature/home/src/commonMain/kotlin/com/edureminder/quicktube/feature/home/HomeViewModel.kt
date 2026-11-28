@@ -23,7 +23,6 @@ data class FeedUi(
 class HomeViewModel(
     private val media: MediaRepository,
     library: com.edureminder.quicktube.core.data.LibraryRepository,
-    private val gamesRepo: com.edureminder.quicktube.core.data.GamesRepository,
     settings: com.edureminder.quicktube.core.data.SettingsRepository,
     private val forYou: com.edureminder.quicktube.core.data.ForYouFeed,
     private val history: com.edureminder.quicktube.core.data.PlaybackHistoryRepository,
@@ -31,11 +30,6 @@ class HomeViewModel(
     /** Settings → Trending on home (off by default). */
     val showTrending = settings.settings.map { it.showTrending }
         .stateIn(viewModelScope, kotlinx.coroutines.flow.SharingStarted.Eagerly, false)
-
-    /** Our games row (Remote Config, refreshed once per interval, rotated per visit). */
-    val games = gamesRepo.games
-
-    init { gamesRepo.refreshIfDue() }
 
     /**
      * Links the plain download sheet can't handle by itself: playlists and channels (their page lists the videos) and
@@ -49,7 +43,7 @@ class HomeViewModel(
     }
 
     /**
-     * A link worth offering from the clipboard: a site QuickTube knows (YouTube, TikTok, Instagram, Facebook, X,
+     * A link worth offering from the clipboard: a supported platform, an extractable link, or a media file.
      * Dailymotion, Vimeo, Bilibili, SoundCloud…), one its extractors read, or a direct media file.
      */
     fun canDownload(url: String): Boolean {
@@ -57,9 +51,6 @@ class HomeViewModel(
         return com.edureminder.quicktube.core.common.Urls.platformOf(u) != com.edureminder.quicktube.core.common.Platform.OTHER ||
             runCatching { media.canExtract(u) }.getOrDefault(false) || com.edureminder.quicktube.core.common.Urls.isMediaFile(u)
     }
-
-    /** Coming back to the app after a long time away refreshes them too (only when due). */
-    fun refreshGames() = gamesRepo.refreshIfDue()
 
     private val _feed = MutableStateFlow(FeedUi())
     val feed: StateFlow<FeedUi> = _feed

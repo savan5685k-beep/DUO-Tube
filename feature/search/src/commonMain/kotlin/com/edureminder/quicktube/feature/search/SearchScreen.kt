@@ -63,7 +63,6 @@ fun SearchScreen(
     onBack: () -> Unit,
     onSearch: (String) -> Unit,
     onOpenUrl: (String) -> Unit,
-    onViewSites: () -> Unit,
     onDownloadUrl: (String) -> Unit = onOpenUrl,
 ) {
     val vm = koinViewModel<SearchViewModel>()
@@ -137,13 +136,13 @@ fun SearchScreen(
                     }
                 }
                 item {
-                    SectionHeader("View sites") { TextButton(onClick = onViewSites) { Text("View all") } }
+                    SectionHeader("Quick websites")
                 }
                 item {
                     FlowRow(Modifier.padding(horizontal = 20.dp), horizontalArrangement = Arrangement.spacedBy(8.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
                         listOf(
                             "YouTube" to "https://m.youtube.com/", "Instagram" to "https://www.instagram.com/",
-                            "Facebook" to "https://m.facebook.com/", "TikTok" to "https://www.tiktok.com/", "Twitter/X" to "https://x.com/",
+                            "Facebook" to "https://m.facebook.com/",
                         ).forEach { (n, u) ->
                             Row(
                                 Modifier.clip(RoundedCornerShape(50)).background(MaterialTheme.colorScheme.surfaceContainerHigh)

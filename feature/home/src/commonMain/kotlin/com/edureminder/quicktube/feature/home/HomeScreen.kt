@@ -205,7 +205,7 @@ private fun DiscoverTab(
     // Android 10+ only lets an app read the clipboard while its window has focus, which comes after
     // ON_RESUME, so read it whenever focus arrives (coming back from another app included).
     val focused = androidx.compose.ui.platform.LocalWindowInfo.current.isWindowFocused
-    // Only links QuickTube can download are offered (a copied GitHub or news link isn't).
+    // Only links DUO can download are offered (a copied GitHub or news link isn't).
     LaunchedEffect(focused) { if (focused) clip = Urls.extractUrl(readClipboard())?.takeIf(vm::canDownload) }
     val list = rememberLazyListState()
 
@@ -242,7 +242,7 @@ private fun DiscoverTab(
                             .clip(RoundedCornerShape(20.dp)).background(ex.brand),
                         contentAlignment = Alignment.Center,
                     ) { Icon(QtIcons.Download, null, tint = MaterialTheme.colorScheme.onPrimary, modifier = Modifier.size(34.dp)) }
-                    Text("QuickTube", style = BrandTitle.copy(brush = ex.brand), modifier = Modifier.padding(top = 14.dp))
+                    Text("DUO Tube", style = BrandTitle.copy(brush = ex.brand), modifier = Modifier.padding(top = 14.dp))
                     Text(
                         "Search, paste a link, or share from any app",
                         style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant,
@@ -305,13 +305,13 @@ private fun DiscoverTab(
                 TrendingCarousel(feed.items.take(12), loading = feed.items.isEmpty(), onOpen = actions.openItem, onDownload = onDownload)
             }
             item(key = "features") {
-                DiscoverHeader("Do more with QuickTube", QtIcons.Bolt, null)
+                DiscoverHeader("DUO tools", QtIcons.Bolt, null)
                 EqualHeightGrid(Modifier.padding(horizontal = 16.dp), columns = if (wideTiles) 3 else 2) {
                     FeatureTile("Bulk download", "Hundreds of links or a .txt file", QtIcons.Checklist, Color(0xFFFF8A3D), Modifier, actions.openBulk)
                     // Sharing from other apps, the in-app browser, the vault and WhatsApp statuses are phone features.
                     if (isMobilePlatform) {
-                        FeatureTile("Share to download", "From YouTube, Facebook, TikTok…", QtIcons.Share, Color(0xFF2FCB7A), Modifier) { actions.openHowTo("YOUTUBE") }
-                        FeatureTile("Browse any site", "Videos are detected automatically", QtIcons.Public, Color(0xFF4C8DFF), Modifier, actions.openSites)
+                        FeatureTile("Share to download", "From YouTube, Instagram and Facebook", QtIcons.Share, Color(0xFF2FCB7A), Modifier) { actions.openHowTo("YOUTUBE") }
+                        FeatureTile("Browser", "Open a link in the in-app browser", QtIcons.Public, Color(0xFF4C8DFF), Modifier, actions.openSites)
                         FeatureTile("Private vault", "Hide files behind a PIN", QtIcons.Lock, Color(0xFFFF5C93), Modifier, actions.openVault)
                         FeatureTile("WhatsApp status", "Save statuses you've viewed", QtIcons.Downloading, Color(0xFF25D366), Modifier) { actions.openHowTo("WHATSAPP") }
                         FeatureTile("Watch history", "Pick up where you left off", QtIcons.History, Color(0xFF9B6BFF), Modifier, actions.openWatchHistory)
@@ -432,11 +432,11 @@ private fun EqualHeightGrid(modifier: Modifier, gap: androidx.compose.ui.unit.Dp
 @Composable
 private fun QuickSites(actions: HomeActions, onYouTube: () -> Unit) {
     val sites = listOf("YouTube" to "https://m.youtube.com/", "Instagram" to "https://www.instagram.com/",
-        "Facebook" to "https://m.facebook.com/", "TikTok" to "https://www.tiktok.com/")
+        "Facebook" to "https://m.facebook.com/")
     Row(Modifier.fillMaxWidth()) {
         sites.forEach { (name, url) ->
             Column(
-                // YouTube is the app's own YouTube tab; the others open their websites.
+                // YouTube opens the app's YouTube tab; Instagram and Facebook open their websites.
                 Modifier.weight(1f).clip(RoundedCornerShape(16.dp))
                     .pressable(scaleDown = 0.9f, onClick = { if (name == "YouTube") onYouTube() else actions.openUrl(url) }).padding(vertical = 6.dp),
                 horizontalAlignment = Alignment.CenterHorizontally,
@@ -444,15 +444,6 @@ private fun QuickSites(actions: HomeActions, onYouTube: () -> Unit) {
                 BrandTile(name, size = 52.dp)
                 Text(name, style = MaterialTheme.typography.labelSmall, maxLines = 1, modifier = Modifier.padding(top = 8.dp))
             }
-        }
-        Column(
-            Modifier.weight(1f).clip(RoundedCornerShape(16.dp)).pressable(scaleDown = 0.9f, onClick = actions.openSites).padding(vertical = 6.dp),
-            horizontalAlignment = Alignment.CenterHorizontally,
-        ) {
-            Box(Modifier.size(52.dp).clip(RoundedCornerShape(17.dp)).background(MaterialTheme.colorScheme.surfaceContainerHigh), contentAlignment = Alignment.Center) {
-                Icon(QtIcons.Apps, null, tint = MaterialTheme.colorScheme.onSurface)
-            }
-            Text("Sites", style = MaterialTheme.typography.labelMedium, maxLines = 1, modifier = Modifier.padding(top = 8.dp))
         }
     }
 }
