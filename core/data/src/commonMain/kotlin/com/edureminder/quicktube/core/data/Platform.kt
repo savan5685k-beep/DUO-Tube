@@ -16,5 +16,5 @@ interface OneTimeFlags {
     fun set(name: String)
 }
 
-/** Bindings each platform makes itself: the library (folders, media index), browser flags, gallery and games. */
+/** Bindings each platform makes itself: the library (folders, media index), browser flags, gallery. */
 internal expect val platformDataModule: org.koin.core.module.Module

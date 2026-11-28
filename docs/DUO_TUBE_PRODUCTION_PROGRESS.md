@@ -2,12 +2,13 @@
 
 Updated: 2026-11-28
 
-## Latest iteration (games/Remote Config removal)
+## Latest iteration (games/Remote Config removal and compile fix)
 
 - Removed Android Firebase Remote Config games fetch, desktop Firebase REST fetch, cached games data/model, games screens and openers, and their test/template docs.
 - Removed Firebase Remote Config dependencies from `core:data`, the unused Google Services/Crashlytics plugin aliases, and desktop build-time generation of Firebase client config.
 - Updated README and privacy docs: no in-app updater/APK installer, no analytics/crash telemetry, quick suggestions are only YouTube/Instagram/Facebook; voice-recognition provider disclosure added.
-- **Validation pending for this new commit.** Previous main `d1e044809970ce9f763544403bf71f0e9b6c199d` has successful CI and APK build (run 46131065044 and 46131065119). The QA artifact SHA-256 is `a04fd84fdee03e270cacd73bcc4cf84ae53aa2ef9b118570f05cfd7db0e74b2e`; it contains arm64, armeabi-v7a, and universal debug APKs.
+- The first removal commit accidentally copied the common `expect` analytics declarations into the Android platform file instead of its `actual` Koin binding. CI/APK builds failed; this fix restores the Android no-op `actual` binding and removes the stale “games” platform comment.
+- Previous verified main `d1e044809970ce9f763544403bf71f0e9b6c199d` has successful CI and APK build (run 46131065044 and 46131065119). The QA artifact SHA-256 is `a04fd84fdee03e270cacd73bcc4cf84ae53aa2ef9b118570f05cfd7db0e74b2e`; it contains arm64, armeabi-v7a, and universal debug APKs. New fix commit validation is pending.
 
 ## Earlier iteration
 
@@ -43,11 +44,10 @@ Updated: 2026-11-28
 
 ## Tests and CI
 
-- Latest CI run: [46129606872](https://github.com/savan5685k-beep/DUO-Tube/actions/runs/46129606872) — in progress at this update.
-- Latest debug APK run: [46129606856](https://github.com/savan5685k-beep/DUO-Tube/actions/runs/46129606856) — in progress at this update.
-- GitLab mirror for commit `8140d55e`: [46129606871](https://github.com/savan5685k-beep/DUO-Tube/actions/runs/46129606871) — success.
-- Previous verified baseline `9dd1db0`: CI [46127956889](https://github.com/savan5685k-beep/DUO-Tube/actions/runs/46127956889), APK build [46127956909](https://github.com/savan5685k-beep/DUO-Tube/actions/runs/46127956909), mirror [46127956866](https://github.com/savan5685k-beep/DUO-Tube/actions/runs/46127956866) — all success.
-- No tests for the new filter or voice-search changes are claimed passed until the current CI run completes.
+- Commit `ccb91c93` (games/Remote Config removal): CI [46132709052](https://github.com/savan5685k-beep/DUO-Tube/actions/runs/46132709052) — **failed**; APK build [46132708939](https://github.com/savan5685k-beep/DUO-Tube/actions/runs/46132708939) — **failed**. Root cause: Android analytics actual binding was missing after the no-op file rename.
+- GitLab mirror for `ccb91c93`: [46132709013](https://github.com/savan5685k-beep/DUO-Tube/actions/runs/46132709013) — success.
+- Fix commit restores the Android Koin `actual analyticsModule` binding; its CI/APK runs are pending.
+- Previous verified main `d1e04480`: CI [46131065044](https://github.com/savan5685k-beep/DUO-Tube/actions/runs/46131065044) and APK build [46131065119](https://github.com/savan5685k-beep/DUO-Tube/actions/runs/46131065119) — success; artifact SHA-256 `a04fd84fdee03e270cacd73bcc4cf84ae53aa2ef9b118570f05cfd7db0e74b2e`.
 
 ## Remaining audit / blockers
 
