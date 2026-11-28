@@ -93,7 +93,7 @@ private val DUO_BLOCKED_HOSTS = setOf(
     "chaturbate.com", "stripchat.com", "livejasmin.com", "cam4.com", "myfreecams.com",
     "onlyfans.com", "fansly.com", "manyvids.com", "nhentai.net", "hentaihaven.xxx",
     "hanime.tv", "hentaistream.com", "f95zone.to", "literotica.com", "sex.com",
-    "adultfriendfinder.com", "ashleyma​dison.com", "brazzers.com", "bangbros.com",
+    "adultfriendfinder.com", "ashleymadison.com", "brazzers.com", "bangbros.com",
     "mofos.com", "naughtyamerica.com", "realitykings.com", "digitalplayground.com",
     "javhd.com", "javlibrary.com", "avgle.com", "sxyprn.com", "motherless.com",
     "heavy-r.com", "ixxx.com", "porndig.com", "pornhub.org", "pornhub.net",
