@@ -16,19 +16,18 @@ import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.TextButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -37,6 +36,9 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import com.edureminder.quicktube.core.designsystem.icon.QtIcons
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 @Composable
 actual fun VoiceSearchControl(
@@ -46,8 +48,10 @@ actual fun VoiceSearchControl(
     val context = LocalContext.current
     val reportError = onError
     var listening by remember { mutableStateOf(false) }
-    var showLanguageDialog by remember { mutableStateOf(false) }
     var requestedLanguage by remember { mutableStateOf("auto") }
+    var tapCount by remember { mutableIntStateOf(0) }
+    var tapJob by remember { mutableStateOf<Job?>(null) }
+    val scope = rememberCoroutineScope()
     var recognizer by remember { mutableStateOf<SpeechRecognizer?>(null) }
     val pulse = rememberInfiniteTransition(label = "mic-pulse")
     val pulseScale by pulse.animateFloat(
@@ -132,42 +136,29 @@ actual fun VoiceSearchControl(
             Box(Modifier.size(40.dp).scale(pulseScale).background(Color(0x2225D366), CircleShape))
         }
         IconButton(onClick = {
-            if (listening) stopListening() else showLanguageDialog = true
+            if (listening) {
+                stopListening()
+                tapJob?.cancel()
+                tapCount = 0
+            } else {
+                tapCount += 1
+                tapJob?.cancel()
+                tapJob = scope.launch {
+                    delay(360)
+                    val language = when (tapCount) {
+                        1 -> "auto"
+                        2 -> "en-IN"
+                        else -> "hi-IN"
+                    }
+                    tapCount = 0
+                    requestedLanguage = language
+                    if (context.checkSelfPermission(Manifest.permission.RECORD_AUDIO) == PackageManager.PERMISSION_GRANTED) startRecognition(language)
+                    else permissionLauncher.launch(Manifest.permission.RECORD_AUDIO)
+                }
+            }
         }) {
-            Icon(QtIcons.Mic, contentDescription = if (listening) "Stop voice input" else "Choose voice-search language",
+            Icon(QtIcons.Mic, contentDescription = if (listening) "Stop voice input" else "Voice search: tap once Auto, twice English, three times Hindi",
                 tint = if (listening) Color(0xFF25D366) else androidx.compose.material3.MaterialTheme.colorScheme.onSurfaceVariant)
         }
-    }
-    if (showLanguageDialog) {
-        AlertDialog(
-            onDismissRequest = { showLanguageDialog = false },
-            title = { Text("Voice search language") },
-            text = {
-                Column {
-                    Text("Choose a language. Auto uses supported automatic detection or your device's recognition language.")
-                    TextButton(onClick = {
-                        showLanguageDialog = false
-                        requestedLanguage = "auto"
-                        if (context.checkSelfPermission(Manifest.permission.RECORD_AUDIO) == PackageManager.PERMISSION_GRANTED) startRecognition("auto")
-                        else permissionLauncher.launch(Manifest.permission.RECORD_AUDIO)
-                    }) { Text("Auto") }
-                    TextButton(onClick = {
-                        showLanguageDialog = false
-                        requestedLanguage = "hi-IN"
-                        if (context.checkSelfPermission(Manifest.permission.RECORD_AUDIO) == PackageManager.PERMISSION_GRANTED) startRecognition("hi-IN")
-                        else permissionLauncher.launch(Manifest.permission.RECORD_AUDIO)
-                    }) { Text("हिन्दी") }
-                    TextButton(onClick = {
-                        showLanguageDialog = false
-                        requestedLanguage = "en-IN"
-                        if (context.checkSelfPermission(Manifest.permission.RECORD_AUDIO) == PackageManager.PERMISSION_GRANTED) startRecognition("en-IN")
-                        else permissionLauncher.launch(Manifest.permission.RECORD_AUDIO)
-                    }) { Text("English") }
-                }
-            },
-            confirmButton = {
-                TextButton(onClick = { showLanguageDialog = false }) { Text("Cancel") }
-            },
-        )
     }
 }
