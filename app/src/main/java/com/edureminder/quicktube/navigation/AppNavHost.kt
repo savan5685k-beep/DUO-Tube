@@ -87,7 +87,6 @@ import com.edureminder.quicktube.feature.tools.StatusSaverScreen
 import com.edureminder.quicktube.feature.tools.StorageCleanScreen
 import com.edureminder.quicktube.feature.tools.VaultScreen
 import com.edureminder.quicktube.feature.home.HomeScreen
-import com.edureminder.quicktube.feature.home.GamesScreen
 import com.edureminder.quicktube.feature.home.HowToScreen
 import com.edureminder.quicktube.feature.library.DownloadingScreen
 import com.edureminder.quicktube.feature.library.LibraryScreen
@@ -236,7 +235,6 @@ fun AppNavHost(nav: NavHostController) {
                             }
                         },
                         openVault = { nav.navigate(VaultRoute) },
-                        openGames = { nav.navigate(GamesRoute) },
                         openBulk = { nav.navigate(BulkRoute()) },
                         openSubscriptions = { nav.navigate(SubscriptionsRoute) },
                         openPlaylists = { music -> nav.navigate(LocalPlaylistsRoute(music)) },
@@ -373,7 +371,6 @@ fun AppNavHost(nav: NavHostController) {
             }
             composable<ChannelRoute> { e -> ListPageScreen(e.toRoute<ChannelRoute>().url, true, nav::popBackStack, ::openItem) }
             composable<PlaylistRoute> { e -> ListPageScreen(e.toRoute<PlaylistRoute>().url, false, nav::popBackStack, ::openItem) }
-            composable<GamesRoute> { GamesScreen(nav::popBackStack) }
             composable<BulkRoute> { e ->
                 val r = e.toRoute<BulkRoute>()
                 com.edureminder.quicktube.feature.home.BulkScreen(r.text, r.name, nav::popBackStack,
