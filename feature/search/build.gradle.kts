@@ -6,4 +6,7 @@ kotlin {
     sourceSets.commonMain.dependencies {
         implementation(projects.core.download)
     }
+    sourceSets.androidMain.dependencies {
+        implementation(libs.androidx.activity.compose)
+    }
 }
