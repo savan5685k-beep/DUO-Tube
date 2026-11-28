@@ -6,5 +6,6 @@ kotlin {
     sourceSets.commonMain.dependencies {
         implementation(projects.core.download)
         implementation(projects.core.common)
+        implementation(projects.core.datastore)
     }
 }
