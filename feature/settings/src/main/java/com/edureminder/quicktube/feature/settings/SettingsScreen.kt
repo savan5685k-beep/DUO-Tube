@@ -118,19 +118,6 @@ fun SettingsScreen(actions: SettingsActions) {
                 NavRow(QtIcons.Shield, "Data collection disabled", "This DUO build has no analytics or crash-reporting SDK.", tint = Green, onClick = {})
             }
         }
-        // Moving to another phone: history, playlists, subscriptions, watch later and settings in one file.
-        item { GroupLabel("Backup") }
-        item {
-            QtCard {
-                NavRow(QtIcons.Download, "Back up to a file", "History, playlists, subscriptions, watch later, settings") {
-                    backupOut.launch("duo-backup-" + java.text.SimpleDateFormat("yyyy-MM-dd", java.util.Locale.US).format(java.util.Date()) + ".json")
-                }
-                RowDivider()
-                NavRow(QtIcons.Restore, "Restore from a file", "Adds them to this phone; nothing here is deleted") {
-                    backupIn.launch(arrayOf("application/json", "text/*", "application/octet-stream"))
-                }
-            }
-        }
         item { GroupLabel("Info") }
         item {
             QtCard {
