@@ -98,18 +98,7 @@ fun SettingsScreen(actions: SettingsActions) {
                 RowDivider()
                 NavRow(QtIcons.History, "Deleted downloads", "Download again anything no longer on this phone", tint = Blue, onClick = actions.deletedHistory)
                 RowDivider()
-                NavRow(BrandIcons.WhatsApp, "WhatsApp status saver", tint = Color(0xFF25D366), onClick = actions.statusSaver)
-                RowDivider()
                 NavRow(QtIcons.Lock, "Vault", "Hide private files behind a PIN", tint = Pink, onClick = actions.vault)
-            }
-        }
-        item { GroupLabel("Phone clean") }
-        item {
-            QtCard {
-                NavRow(QtIcons.CleaningServices, "Storage clean", "Temporary files, cache and leftovers", tint = Teal, onClick = actions.storageClean)
-                RowDivider()
-                NavRow(QtIcons.FolderZip, "Large files clean", "Find big videos, music and photos", tint = Amber, onClick = actions.largeFiles)
-                RowDivider()
             }
         }
         item { GroupLabel("Privacy") }
