@@ -66,46 +66,6 @@ fun SettingsScreen(actions: SettingsActions) {
     val s by vm.settings.collectAsStateWithLifecycle()
     val trash by vm.trashCount.collectAsStateWithLifecycle()
     val context = LocalContext.current
-    val updates = org.koin.compose.koinInject<com.edureminder.quicktube.core.update.UpdateManager>()
-    val updateState by updates.state.collectAsStateWithLifecycle()
-    val backup = org.koin.compose.koinInject<com.edureminder.quicktube.core.data.BackupManager>()
-    val backupScope = androidx.compose.runtime.rememberCoroutineScope()
-    val backupOut = androidx.activity.compose.rememberLauncherForActivityResult(androidx.activity.result.contract.ActivityResultContracts.CreateDocument("application/json")) { uri ->
-        uri ?: return@rememberLauncherForActivityResult
-        backupScope.launch {
-            val ok = runCatching {
-                val text = backup.export()
-                kotlinx.coroutines.withContext(kotlinx.coroutines.Dispatchers.IO) {
-                    context.contentResolver.openOutputStream(uri, "wt")!!.use { it.write(text.toByteArray()) }
-                }
-            }.isSuccess
-            android.widget.Toast.makeText(context, if (ok) "Backup saved" else "Couldn't save the backup", android.widget.Toast.LENGTH_SHORT).show()
-        }
-    }
-    val backupIn = androidx.activity.compose.rememberLauncherForActivityResult(androidx.activity.result.contract.ActivityResultContracts.OpenDocument()) { uri ->
-        uri ?: return@rememberLauncherForActivityResult
-        backupScope.launch {
-            val r = runCatching {
-                val text = kotlinx.coroutines.withContext(kotlinx.coroutines.Dispatchers.IO) {
-                    context.contentResolver.openInputStream(uri)!!.use { it.readBytes().decodeToString() }
-                }
-                backup.import(text)
-            }
-            android.widget.Toast.makeText(
-                context, r.fold({ "Restored: " + it.summary() }, { it.message?.takeIf { m -> "DUO" in m } ?: "That file isn't a DUO backup" }),
-                android.widget.Toast.LENGTH_LONG,
-            ).show()
-        }
-    }
-    val updateSummary = when (updateState) {
-        is com.edureminder.quicktube.core.update.UpdateState.Checking -> "Checking…"
-        is com.edureminder.quicktube.core.update.UpdateState.UpToDate -> "You're on the latest version"
-        is com.edureminder.quicktube.core.update.UpdateState.Failed -> "Couldn't check. Tap to try again"
-        is com.edureminder.quicktube.core.update.UpdateState.Downloading -> (updateState as com.edureminder.quicktube.core.update.UpdateState.Downloading)
-            .let { d -> "Downloading update… " + if (d.total > 0) "${d.bytes * 100 / d.total}%" else "" }
-        is com.edureminder.quicktube.core.update.UpdateState.Installing -> "Installing update…"
-        else -> "Version ${appVersion(context)}"
-    }
     LazyColumn(Modifier.fillMaxSize().readableWidth().statusBarsPadding(), contentPadding = PaddingValues(bottom = 24.dp + LocalBottomBarHeight.current)) {
         item {
             Text("Settings", style = MaterialTheme.typography.headlineMedium, modifier = Modifier.padding(start = 24.dp, top = 18.dp, bottom = 6.dp))
@@ -185,7 +145,6 @@ fun SettingsScreen(actions: SettingsActions) {
                     ), "Share DUO"))
                 }
                 RowDivider()
-                NavRow(QtIcons.Downloading, "Check for updates", updateSummary, tint = Teal) { updates.checkOrShow() }
                 RowDivider()
                 NavRow(QtIcons.Info, "About", trailing = "v" + appVersion(context), tint = Blue, onClick = actions.about)
             }
