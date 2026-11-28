@@ -103,6 +103,7 @@ private val tabs = listOf(
     NavTab(HomeRoute, "Download", QtIcons.Download, QtIcons.Download),
     NavTab(LibraryRoute, "Play", QtIcons.PlayCircleOutline, QtIcons.PlayCircle),
     NavTab(GalleryRoute, "Gallery", QtIcons.Gallery, QtIcons.GalleryFilled),
+    NavTab(StatusSaverRoute, "Status", QtIcons.Downloading, QtIcons.Downloading),
     NavTab(SettingsRoute, "Settings", QtIcons.Settings, QtIcons.SettingsFilled),
 )
 
