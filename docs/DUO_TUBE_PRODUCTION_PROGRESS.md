@@ -98,3 +98,8 @@ Production readiness is not declared.
 - Status media still launches Android external viewers; an in-app status viewer remains pending. Advanced swipe-to-PiP remains pending; Android system PiP resize behavior and swipe entry need device-level testing.
 - Crash is not reproducible from the available information; no telemetry is enabled. Crash root cause remains unverified.
 - Latest workflow runs are pending/queued and earlier runs were cancelled by subsequent commits. No validation claim is made for these new commits until the latest main CI and APK workflows complete.
+
+
+## Navigation correction — 2026-11-28
+
+- User corrected the Status Saver tab position requirement: it must be **second**, directly after Download (not fourth). Updated `AppNavHost` order to Download, Status, Play, Gallery, Settings. Download-count badge moved to Play's new index (2). Commit `f0d27290`. CI/build pending.
