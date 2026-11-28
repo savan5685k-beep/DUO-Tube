@@ -4,7 +4,7 @@ Updated: 2026-11-28
 
 ## Current main
 
-- SHA: d57cc6cf56c02d385af306ca274a810066cb8864
+- SHA: 06b61076e7636f7513aa3410cb39d1ab1c91ecb7
 - Current main includes the branding, voice-search, privacy, security, search-suggestion, and download-flow changes plus a test fix for DUO metadata.
 
 ## Implemented
@@ -48,3 +48,13 @@ Updated: 2026-11-28
 - Device QA is still required for permissions, Hindi/English speech-recognition availability, downloads, Status Saver, PiP, WebView behavior, and the complete UI.
 
 Production readiness is not declared.
+
+
+## Static audit notes (2026-11-28)
+
+- App manifest review: `INTERNET` is the app-level permission; modules add network-state, foreground download/media services, notification, wake-lock, and local media/storage permissions. Mic permission is declared in search and is requested only from the voice-search control after user invocation.
+- Exported components: launcher/link entry and share receiver are exported by design; FileProvider is not exported and grants URI access; download/job services are not exported. MediaSession service is exported intentionally for external media controls and remains device QA/security review scope.
+- No Firebase/Crashlytics/analytics SDK entries found in the version catalog; the analytics module is no-op. This is a static dependency/config review, not a runtime packet capture.
+- WebView: Safe Browsing enabled (API 26+), mixed content disallowed, SSL failures cancelled, and third-party cookies disabled. Cleartext HTTP remains globally enabled for browser/downloader compatibility.
+- **Outstanding WebView security review:** `QtSniffer` and `QtFetch` JavaScript interfaces are attached to the browsing WebView and exposed to page JavaScript across arbitrary sites. `QtFetch` only returns results for pending IDs, but no per-origin bridge allowlist is visible. Before release, review whether media-sniffing bridges can be restricted by origin/navigation lifecycle or safely redesigned. Do not treat this as resolved.
+- APK signature verification with `apksigner` was not available in this runtime. APK and artifact ZIP integrity checks passed; no device install/runtime test has been performed.
