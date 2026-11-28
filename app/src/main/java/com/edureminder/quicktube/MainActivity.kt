@@ -51,7 +51,6 @@ import com.edureminder.quicktube.core.navigation.DownloadingRoute
 import com.edureminder.quicktube.core.navigation.LibraryRoute
 import com.edureminder.quicktube.core.navigation.PlayerRoute
 import com.edureminder.quicktube.navigation.AppNavHost
-import com.edureminder.quicktube.player.FloatingPlayerActivity
 import com.edureminder.quicktube.core.navigation.VideoRoute
 import androidx.navigation.NavDestination.Companion.hasRoute
 import com.edureminder.quicktube.navigation.UrlRouter
@@ -113,12 +112,7 @@ class MainActivity : ComponentActivity() {
         }
     }
 
-    override fun onUserLeaveHint() {
-        super.onUserLeaveHint()
-        // Leaving the app from a playing video (Settings → Player → Picture-in-picture): it goes on in the floating
-        // window, a task of its own, so opening DUO again doesn't close it.
-        if (PipState.wanted.value && !PipState.floating.value) FloatingPlayerActivity.start(this)
-    }
+    // PiP is entered only through the explicit player control now. Avoid surprise floating windows on app exit.
 
     override fun onStop() {
         super.onStop()
