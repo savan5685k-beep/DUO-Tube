@@ -20,6 +20,9 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.TextButton
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
@@ -42,6 +45,8 @@ actual fun VoiceSearchControl(
     val context = LocalContext.current
     val reportError = onError
     var listening by remember { mutableStateOf(false) }
+    var showLanguageDialog by remember { mutableStateOf(false) }
+    var requestedLanguage by remember { mutableStateOf("auto") }
     var recognizer by remember { mutableStateOf<SpeechRecognizer?>(null) }
     val pulse = rememberInfiniteTransition(label = "mic-pulse")
     val pulseScale by pulse.animateFloat(
@@ -59,7 +64,7 @@ actual fun VoiceSearchControl(
         recognizer = null
         listening = false
     }
-    fun startRecognition() {
+    fun startRecognition(languageMode: String) {
         if (!SpeechRecognizer.isRecognitionAvailable(context)) {
             reportError("Voice recognition isn't available on this device.")
             return
@@ -96,15 +101,24 @@ actual fun VoiceSearchControl(
             putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, RecognizerIntent.LANGUAGE_MODEL_FREE_FORM)
             putExtra(RecognizerIntent.EXTRA_MAX_RESULTS, 3)
             putExtra(RecognizerIntent.EXTRA_PARTIAL_RESULTS, true)
-            // Do not force Hindi or English. On supported Android 14+ services, allow automatic language detection.
-            if (Build.VERSION.SDK_INT >= 34) putExtra("android.speech.extra.LANGUAGE_DETECTION_ALLOWED", true)
+            when (languageMode) {
+                "hi-IN", "en-IN" -> {
+                    putExtra(RecognizerIntent.EXTRA_LANGUAGE, languageMode)
+                    putExtra(RecognizerIntent.EXTRA_LANGUAGE_PREFERENCE, languageMode)
+                }
+                else -> {
+                    // Android 14+ recognition services may auto-detect Hindi/English. Older versions
+                    // fall back to the device/service language; users can choose Hindi or English explicitly.
+                    if (Build.VERSION.SDK_INT >= 34) putExtra("android.speech.extra.LANGUAGE_DETECTION_ALLOWED", true)
+                }
+            }
         }
         runCatching { speech.startListening(intent) }
             .onFailure { listening = false; reportError("Couldn't start voice recognition. Try typing your search.") }
     }
 
     val permissionLauncher = rememberLauncherForActivityResult(ActivityResultContracts.RequestPermission()) { granted ->
-        if (granted) startRecognition()
+        if (granted) startRecognition(requestedLanguage)
         else reportError("Microphone permission was denied. You can still search by typing.")
     }
     DisposableEffect(Unit) {
@@ -117,12 +131,41 @@ actual fun VoiceSearchControl(
             Box(Modifier.size(40.dp).scale(pulseScale).background(Color(0x2225D366), CircleShape))
         }
         IconButton(onClick = {
-            if (listening) stopListening()
-            else if (context.checkSelfPermission(Manifest.permission.RECORD_AUDIO) == PackageManager.PERMISSION_GRANTED) startRecognition()
-            else permissionLauncher.launch(Manifest.permission.RECORD_AUDIO)
+            if (listening) stopListening() else showLanguageDialog = true
         }) {
-            Icon(QtIcons.Mic, contentDescription = if (listening) "Stop voice input" else "Start voice input",
+            Icon(QtIcons.Mic, contentDescription = if (listening) "Stop voice input" else "Choose voice-search language",
                 tint = if (listening) Color(0xFF25D366) else androidx.compose.material3.MaterialTheme.colorScheme.onSurfaceVariant)
         }
+    }
+    if (showLanguageDialog) {
+        AlertDialog(
+            onDismissRequest = { showLanguageDialog = false },
+            title = { Text("Voice search language") },
+            text = { Text("Choose a language for recognition. Auto uses supported automatic detection or your device's recognition language.") },
+            confirmButton = {
+                TextButton(onClick = {
+                    showLanguageDialog = false
+                    requestedLanguage = "auto"
+                    if (context.checkSelfPermission(Manifest.permission.RECORD_AUDIO) == PackageManager.PERMISSION_GRANTED) startRecognition("auto")
+                    else permissionLauncher.launch(Manifest.permission.RECORD_AUDIO)
+                }) { Text("Auto") }
+            },
+            dismissButton = {
+                Row {
+                    TextButton(onClick = {
+                        showLanguageDialog = false
+                        requestedLanguage = "hi-IN"
+                        if (context.checkSelfPermission(Manifest.permission.RECORD_AUDIO) == PackageManager.PERMISSION_GRANTED) startRecognition("hi-IN")
+                        else permissionLauncher.launch(Manifest.permission.RECORD_AUDIO)
+                    }) { Text("हिन्दी") }
+                    TextButton(onClick = {
+                        showLanguageDialog = false
+                        requestedLanguage = "en-IN"
+                        if (context.checkSelfPermission(Manifest.permission.RECORD_AUDIO) == PackageManager.PERMISSION_GRANTED) startRecognition("en-IN")
+                        else permissionLauncher.launch(Manifest.permission.RECORD_AUDIO)
+                    }) { Text("English") }
+                }
+            },
+        )
     }
 }
