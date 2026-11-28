@@ -86,17 +86,17 @@ jobs:
             # Output differs between build-tools versions ("Signer #1 certificate …" vs "V2 Signer: certificate …").
             digest=$(echo "$report" | grep -m1 -oE "certificate SHA-256 digest: [0-9a-f]{64}" | awk '{print $NF}')
             echo "$abi signed with certificate SHA-256: ${digest:-none}"
-            # Fingerprint of the QuickTube release key (public; not a secret). Anything else is refused.
+            # Fingerprint of the DUO release key (public; not a secret). Anything else is refused.
             if [ "$digest" != "$EXPECTED_CERT_SHA256" ]; then
-              echo "$report"; echo "::error::$src is not signed with the QuickTube release key"; exit 1
+              echo "$report"; echo "::error::$src is not signed with the DUO release key"; exit 1
             fi
             # Some phones' installers (vivo…) refuse an APK without the v1 JAR signature: "missing the developer certificate".
             # (apksigner skips v1 for minSdk 24+, so check as if for Android 6, like those installers do.)
             if ! v1=$("$apksigner" verify --verbose --min-sdk-version 23 "$src" 2>&1) || ! echo "$v1" | grep -q "v1 scheme (JAR signing): true"; then
               echo "$v1"; echo "::error::$src has no valid v1 (JAR) signature"; exit 1
             fi
-            if [ "$abi" = universal ]; then out="QuickTube-v${{ steps.version.outputs.name }}.apk"
-            else out="QuickTube-v${{ steps.version.outputs.name }}-$abi.apk"; fi
+            if [ "$abi" = universal ]; then out="DUO-v${{ steps.version.outputs.name }}.apk"
+            else out="DUO-v${{ steps.version.outputs.name }}-$abi.apk"; fi
             cp "$src" "dist/$out"
             (cd dist && sha256sum "$out" > "$out.sha256")
           done
@@ -107,10 +107,10 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: |
           tag="v${{ steps.version.outputs.name }}"
-          universal="dist/QuickTube-$tag.apk"
+          universal="dist/DUO-$tag.apk"
           # The previous Android release: skip prereleases (the video decoder pack) and desktop-v* releases.
           prev=$(gh release list --exclude-pre-releases --limit 50 --json tagName -q '[.[].tagName | select(startswith("v"))][0] // empty' 2>/dev/null || true)
-          args=(--target "${{ github.sha }}" --title "QuickTube $tag" --generate-notes)
+          args=(--target "${{ github.sha }}" --title "DUO $tag" --generate-notes)
           [ -n "$prev" ] && args+=(--notes-start-tag "$prev")
           # Built as a draft (invisible to apps), universal APK uploaded last, one file at a time: versions up to
           # 1.0.3 take the last .apk / .apk.sha256 asset. Published only once everything is there.
