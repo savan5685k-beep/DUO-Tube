@@ -368,7 +368,9 @@ fun BrowserScreen(
                     WebView(ctx).apply {
                         layoutParams = ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT)
                         applyBrowserSettings()
-                        settings.safeBrowsingEnabled = true\n                        settings.mediaPlaybackRequiresUserGesture = false
+                        CookieManager.getInstance().setAcceptThirdPartyCookies(this, false)
+                        settings.safeBrowsingEnabled = true
+                        settings.mediaPlaybackRequiresUserGesture = false
                         settings.loadWithOverviewMode = true
                         settings.useWideViewPort = true
                         settings.builtInZoomControls = true
@@ -415,6 +417,7 @@ fun BrowserScreen(
                         webViewClient = object : WebViewClient() {
                             override fun shouldOverrideUrlLoading(view: WebView, request: WebResourceRequest): Boolean {
                                 val u = request.url.toString()
+                                if (duoBlockedUrl(u)) { view.loadDataWithBaseURL(null, duoBlockResponseHtml(), "text/html", "UTF-8", null); return true }
                                 if (u.startsWith("http")) return false
                                 // The invisible page behind the share sheet must never open another app (e.g. Facebook's
                                 // "open in app" bounce); it stays on the web page.
@@ -436,7 +439,10 @@ fun BrowserScreen(
                                 return true
                             }
 
-                            override fun onPageStarted(view: WebView, url: String, favicon: Bitmap?) = vm.onPageStarted(url)
+                            override fun onPageStarted(view: WebView, url: String, favicon: Bitmap?) {
+                                if (duoBlockedUrl(url)) { view.stopLoading(); view.loadDataWithBaseURL(null, duoBlockResponseHtml(), "text/html", "UTF-8", null); return }
+                                vm.onPageStarted(url)
+                            }
 
                             override fun onPageFinished(view: WebView, url: String) {
                                 vm.onPageFinished(url, view.title)
@@ -464,6 +470,7 @@ fun BrowserScreen(
 
                             override fun shouldInterceptRequest(view: WebView, request: WebResourceRequest): WebResourceResponse? {
                                 val u = request.url.toString()
+                                if (duoBlockedUrl(u)) return duoBlockResponse()
                                 val path = request.url.path.orEmpty().lowercase()
                                 if (path.endsWith(".mp4") || path.endsWith(".m4v") || path.endsWith(".m4a") || path.endsWith(".mp3") ||
                                     path.endsWith(".webm") || path.endsWith(".mov") || path.endsWith(".flv") || path.endsWith(".m3u8") ||
@@ -474,6 +481,7 @@ fun BrowserScreen(
                         }
                         webChromeClient = object : WebChromeClient() {
                             override fun onProgressChanged(view: WebView, newProgress: Int) = vm.onProgress(newProgress, view.canGoBack())
+                            override fun onPermissionRequest(request: android.webkit.PermissionRequest) { request.deny() }
 
                             override fun onCreateWindow(view: WebView, isDialog: Boolean, isUserGesture: Boolean, resultMsg: android.os.Message?): Boolean {
                                 // target=_blank links the user tapped open here; a window a tapped button opens is
