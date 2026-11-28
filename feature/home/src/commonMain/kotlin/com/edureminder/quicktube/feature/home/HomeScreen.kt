@@ -111,7 +111,7 @@ class HomeActions(
     val openLocalPlaylist: (Long) -> Unit = {},
 )
 
-private val tabs = listOf("Search", "YouTube", "Music", "Status")
+private val tabs = listOf("Search", "YouTube", "Music")
 
 @Composable
 fun HomeScreen(actions: HomeActions, modifier: Modifier = Modifier) {
@@ -131,11 +131,6 @@ fun HomeScreen(actions: HomeActions, modifier: Modifier = Modifier) {
             // The Search page warms the YouTube tab only when it shows the trending row (Settings → Trending on home).
             0 -> { if (vm.showTrending.value) vm.ensureFeed() }
             1 -> vm.ensureFeed()
-            3 -> {
-                // Open the actual Status screen directly, without the old interstitial landing page.
-                actions.openStatusSaver()
-                pager.scrollToPage(0)
-            }
         }
     }
 
