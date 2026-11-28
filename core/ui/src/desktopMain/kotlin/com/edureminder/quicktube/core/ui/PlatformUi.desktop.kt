@@ -1,6 +1,8 @@
 package com.edureminder.quicktube.core.ui
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import kotlinx.coroutines.flow.MutableSharedFlow
 
@@ -45,6 +47,20 @@ actual fun rememberClipboardReader(): () -> String? = remember {
             java.awt.Toolkit.getDefaultToolkit().systemClipboard.getData(java.awt.datatransfer.DataFlavor.stringFlavor) as? String
         }.getOrNull()
     }
+}
+
+
+
+@Composable
+actual fun rememberClipboardRevision(): Int {
+    val clipboard = remember { java.awt.Toolkit.getDefaultToolkit().systemClipboard }
+    val revision = remember(clipboard) { mutableStateOf(0) }
+    DisposableEffect(clipboard) {
+        val listener = java.awt.datatransfer.FlavorListener { revision.value += 1 }
+        clipboard.addFlavorListener(listener)
+        onDispose { clipboard.removeFlavorListener(listener) }
+    }
+    return revision.value
 }
 
 @Composable
