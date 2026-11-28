@@ -79,7 +79,6 @@ import com.edureminder.quicktube.feature.settings.RegionScreen
 import com.edureminder.quicktube.feature.settings.SettingsActions
 import com.edureminder.quicktube.feature.settings.SettingsScreen
 import com.edureminder.quicktube.feature.settings.ThemeSettingsScreen
-import com.edureminder.quicktube.feature.tools.AppManagerScreen
 import com.edureminder.quicktube.feature.tools.DeletedHistoryScreen
 import com.edureminder.quicktube.feature.tools.LargeFilesScreen
 import com.edureminder.quicktube.feature.tools.RecycleBinScreen
@@ -235,6 +234,7 @@ fun AppNavHost(nav: NavHostController) {
                             }
                         },
                         openVault = { nav.navigate(VaultRoute) },
+                        openStatusSaver = { nav.navigate(StatusSaverRoute) },
                         openBulk = { nav.navigate(BulkRoute()) },
                         openSubscriptions = { nav.navigate(SubscriptionsRoute) },
                         openPlaylists = { music -> nav.navigate(LocalPlaylistsRoute(music)) },
@@ -319,7 +319,6 @@ fun AppNavHost(nav: NavHostController) {
                         vault = { nav.navigate(VaultRoute) },
                         storageClean = { nav.navigate(StorageCleanRoute) },
                         largeFiles = { nav.navigate(LargeFilesRoute) },
-                        appManager = { nav.navigate(AppManagerRoute) },
                         region = { nav.navigate(LanguageRoute) },
                         about = { nav.navigate(AboutRoute) },
                     ),
@@ -336,14 +335,12 @@ fun AppNavHost(nav: NavHostController) {
             composable<VaultRoute> { VaultScreen(nav::popBackStack, onOpenPlayer = { nav.navigate(PlayerRoute) { launchSingleTop = true } }) }
             composable<StorageCleanRoute> { StorageCleanScreen(nav::popBackStack) }
             composable<LargeFilesRoute> { LargeFilesScreen(nav::popBackStack) }
-            composable<AppManagerRoute> { AppManagerScreen(nav::popBackStack) }
             composable<SearchRoute> { e ->
                 SearchScreen(
                     e.toRoute<SearchRoute>().initial,
                     onBack = nav::popBackStack,
                     onSearch = { q -> nav.navigate(SearchResultsRoute(q)) { popUpTo<SearchRoute> { inclusive = true } } },
                     onOpenUrl = { u -> nav.navigate(router.routeFor(u)) { popUpTo<SearchRoute> { inclusive = true } } },
-                    onViewSites = { nav.navigate(SitesRoute) },
                     onDownloadUrl = { u -> nav.navigate(router.routeForPasted(u)) { popUpTo<SearchRoute> { inclusive = true } } },
                 )
             }

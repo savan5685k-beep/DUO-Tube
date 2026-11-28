@@ -48,7 +48,6 @@ class SettingsActions(
     val vault: () -> Unit,
     val storageClean: () -> Unit,
     val largeFiles: () -> Unit,
-    val appManager: () -> Unit,
     val region: () -> Unit,
     val about: () -> Unit,
 )
@@ -151,7 +150,6 @@ fun SettingsScreen(actions: SettingsActions) {
                 RowDivider()
                 NavRow(QtIcons.FolderZip, "Large files clean", "Find big videos, music and photos", tint = Amber, onClick = actions.largeFiles)
                 RowDivider()
-                NavRow(QtIcons.Apps, "App uninstaller", tint = Purple, onClick = actions.appManager)
             }
         }
         item { GroupLabel("Privacy") }
@@ -165,7 +163,7 @@ fun SettingsScreen(actions: SettingsActions) {
         item {
             QtCard {
                 NavRow(QtIcons.Download, "Back up to a file", "History, playlists, subscriptions, watch later, settings") {
-                    backupOut.launch("quicktube-backup-" + java.text.SimpleDateFormat("yyyy-MM-dd", java.util.Locale.US).format(java.util.Date()) + ".json")
+                    backupOut.launch("duo-backup-" + java.text.SimpleDateFormat("yyyy-MM-dd", java.util.Locale.US).format(java.util.Date()) + ".json")
                 }
                 RowDivider()
                 NavRow(QtIcons.Restore, "Restore from a file", "Adds them to this phone; nothing here is deleted") {

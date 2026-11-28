@@ -38,12 +38,12 @@ fun HowToScreen(platformName: String, onBack: () -> Unit, openInBrowser: (String
     val context = LocalContext.current
     val steps: List<Pair<ImageVector, String>> = if (platform == Platform.WHATSAPP) listOf(
         QtIcons.TouchApp to "Open WhatsApp and view the status you want to keep",
-        QtIcons.Link to "Come back to QuickTube → Settings → WhatsApp status saver",
+        QtIcons.Link to "Come back to DUO Tube → WhatsApp Saver",
         QtIcons.Download to "Tap the download button on any status",
     ) else listOf(
         QtIcons.Share to "Open ${platform.title}, find a video and tap \"Share\"",
         QtIcons.MoreHoriz to "Tap \"More\" (or \"Copy link\")",
-        QtIcons.Download to "Choose \"QuickTube\" in the share list — or paste the link into QuickTube's search box",
+        QtIcons.Download to "Choose \"DUO Tube\" in the share list — or paste the link into DUO Tube's search box",
     )
     Scaffold(topBar = { QtTopBar("How to download", onBack) }) { pad ->
         Column(Modifier.fillMaxSize().padding(pad).padding(horizontal = 20.dp)) {

@@ -13,6 +13,21 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.DisposableEffect
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.unit.dp
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import kotlinx.coroutines.delay
 import com.edureminder.quicktube.core.playerui.PipState
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -65,6 +80,13 @@ class MainActivity : ComponentActivity() {
         }
         if (savedInstanceState == null) pendingIntent = intent
         setContent {
+            var showWelcome by remember { mutableStateOf(savedInstanceState == null) }
+            LaunchedEffect(Unit) {
+                if (showWelcome) {
+                    delay(1600)
+                    showWelcome = false
+                }
+            }
             val s by settings.settings.collectAsStateWithLifecycle(AppSettings())
             val nav = rememberNavController()
             val dark = s.isDark()
@@ -80,8 +102,11 @@ class MainActivity : ComponentActivity() {
                 // screens' own handlers, so it only runs when none of them does), Android has no back gesture left to
                 // animate with its shrinking "back to home" card.
                 androidx.activity.compose.BackHandler { moveTaskToBack(true) }
-                AppNavHost(nav)
-                UpdatePrompt()
+                Box(Modifier.fillMaxSize()) {
+                    AppNavHost(nav)
+                    if (!showWelcome) UpdatePrompt()
+                    if (showWelcome) WelcomeScreen()
+                }
             }
             LaunchedEffect(pendingIntent) {
                 val i = pendingIntent ?: return@LaunchedEffect
@@ -145,5 +170,19 @@ class MainActivity : ComponentActivity() {
     companion object {
         const val EXTRA_SHOW_SHEET = "show_sheet"
         const val EXTRA_BULK = "bulk_links"
+    }
+}
+
+@Composable
+private fun WelcomeScreen() {
+    Box(
+        Modifier.fillMaxSize().background(MaterialTheme.colorScheme.background),
+        contentAlignment = Alignment.Center,
+    ) {
+        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+            Image(painterResource(com.edureminder.quicktube.R.drawable.splash_icon), contentDescription = "DUO Tube logo", modifier = Modifier.size(128.dp))
+            Text("Welcome to DUO Tube", style = MaterialTheme.typography.headlineSmall, modifier = Modifier.padding(top = 20.dp))
+            Text("Your media, with privacy in mind", style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant, modifier = Modifier.padding(top = 8.dp))
+        }
     }
 }
