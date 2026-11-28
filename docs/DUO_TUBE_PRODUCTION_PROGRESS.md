@@ -16,6 +16,7 @@ Updated: 2026-11-28
 - In-app updater/APK installation flow and install permission removed.
 - Analytics/crash telemetry SDKs and unused games Remote Config fetch removed; analytics abstraction is no-op.
 - Voice-search permission is requested only when the user invokes voice search. Voice results fill the query without auto-submit.
+- Android voice search now offers Auto, Hindi (`hi-IN`), and English (`en-IN`) modes. Auto allows Android 14+ service language detection and otherwise uses the device/recognizer language; explicit Hindi/English modes pass language and preference extras. This change is awaiting CI/device verification.
 - URL/content filtering is applied in the browser, search, share/open routing, download-sheet, and bulk-download flows. WebView Safe Browsing, mixed-content blocking, and SSL-error cancellation are enabled.
 - Existing content filter is retained. I will not expand or publish explicit domain/keyword lists; generic filter logic and privacy/security review can continue.
 
@@ -58,3 +59,10 @@ Production readiness is not declared.
 - WebView: Safe Browsing enabled (API 26+), mixed content disallowed, SSL failures cancelled, and third-party cookies disabled. Cleartext HTTP remains globally enabled for browser/downloader compatibility.
 - **Outstanding WebView security review:** `QtSniffer` and `QtFetch` JavaScript interfaces are attached to the browsing WebView and exposed to page JavaScript across arbitrary sites. `QtFetch` only returns results for pending IDs, but no per-origin bridge allowlist is visible. Before release, review whether media-sniffing bridges can be restricted by origin/navigation lifecycle or safely redesigned. Do not treat this as resolved.
 - APK signature verification with `apksigner` was not available in this runtime. APK and artifact ZIP integrity checks passed; no device install/runtime test has been performed.
+
+
+## Latest iteration
+
+- d57cc6cf CI run 46140412771 passed (debug APK build and unit tests). APK workflow 46140412687 passed and uploaded verified debug artifact ID 15261108167. ZIP integrity checks passed; artifact SHA-256 `9c36d0fa204b2812cb1cb0716ca3fca563e5921eb6d99f2ba7b0acfb56346565`; universal APK SHA-256 `e5f264cdf93818738b9239ff469351235218760bbd2786153b0f8e90b00bd74e`.
+- Voice language chooser commits 7864e832 and e65616fe. The first CI run for 7864e832 was cancelled when the UI refinement landed; the latest CI and APK workflow on e65616fe were running at the time of this update. Do not claim their pass until checked.
+- Current QA downloads are debug builds, not release-signed production APKs. `apksigner` is unavailable here, so signature verification and device installation/runtime tests remain unperformed.
