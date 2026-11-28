@@ -176,7 +176,12 @@ fun VideoPlayerBox(
                     .aspectRatio(ratio, matchHeightConstraintsFirst = !fitWide),
             )
         } else {
-            Icon(QtIcons.Headphones, null, tint = Color.White.copy(.3f), modifier = Modifier.size(56.dp))
+            val audioArtwork = state.current?.artwork
+            if (audioArtwork != null) coil3.compose.AsyncImage(
+                audioArtwork, null, contentScale = androidx.compose.ui.layout.ContentScale.Crop,
+                modifier = Modifier.fillMaxSize(), alpha = 0.35f,
+            )
+            Icon(QtIcons.Headphones, "Audio-only playback", tint = Color.White.copy(.88f), modifier = Modifier.size(56.dp))
         }
         // Until the first frame: the video's own thumbnail instead of a black box, faded out as the picture arrives.
         val poster = state.current?.artwork?.takeIf { !state.audioOnly && state.error == null }
