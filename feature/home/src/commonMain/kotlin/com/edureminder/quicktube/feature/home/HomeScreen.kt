@@ -279,7 +279,7 @@ private fun DiscoverTab(
                     AnimatedVisibility(clip != null, enter = fadeIn() + expandVertically(), exit = fadeOut() + shrinkVertically()) {
                         val url = clip.orEmpty()
                         Row(
-                            Modifier.padding(top = 14.dp).fillMaxWidth().clip(RoundedCornerShape(20.dp)
+                            Modifier.padding(top = 14.dp).fillMaxWidth().clip(RoundedCornerShape(20.dp))
                                 .background(MaterialTheme.colorScheme.primaryContainer)
                                 .pointerInput(url) {
                                     var swipeDistance = 0f
