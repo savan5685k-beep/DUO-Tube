@@ -34,6 +34,18 @@ class BrowserContentFilterTest {
     }
 
     @Test
+    fun blocksStandaloneSexTermInUrlPathOrQuery() {
+        assertTrue(duoBlockedUrl("https://search.example/?q=sex"))
+        assertTrue(duoBlockedUrl("https://example.org/sex/"))
+    }
+
+    @Test
+    fun doesNotBlockSexAsPartOfAnOrdinaryWord() {
+        assertFalse(duoBlockedUrl("https://example.org/?q=sexton"))
+        assertFalse(duoBlockedUrl("https://example.org/?q=sexiness"))
+    }
+
+    @Test
     fun doesNotBlockOrdinaryUrlsOrWordsAsSubstrings() {
         assertFalse(duoBlockedUrl("https://youtube.com/watch?v=abc"))
         assertFalse(duoBlockedUrl("https://instagram.com/"))

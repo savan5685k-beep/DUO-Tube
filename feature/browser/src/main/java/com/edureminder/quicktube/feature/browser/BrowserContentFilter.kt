@@ -3,6 +3,7 @@ package com.edureminder.quicktube.feature.browser
 import java.net.IDN
 import java.net.URI
 import java.net.URLDecoder
+import android.webkit.WebResourceResponse
 
 /**
  * Conservative URL-level adult-content filter.
@@ -31,7 +32,7 @@ private val DUO_BLOCKED_HOSTS = setOf(
 )
 
 private val DUO_BLOCKED_TERMS = Regex(
-    """(?i)(?<![a-z0-9])(?:porn(?:ography|ographic)?|porno|xxx|sexcam|webcamsex|hentai|rule34|nsfw|adult(?:[-_ ]?content)?|erotic|explicit(?:[-_ ]?content)?|sexual[-_ ]?content|sex[-_ ]?content)(?![a-z0-9])"""
+    """(?i)(?<![a-z0-9])(?:porn(?:ography|ographic)?|porno|xxx|sex|sexcam|webcamsex|hentai|rule34|nsfw|adult(?:[-_ ]?content)?|erotic|explicit(?:[-_ ]?content)?|sexual[-_ ]?content|sex[-_ ]?content)(?![a-z0-9])"""
 )
 
 private fun normalizedHost(uri: URI): String? {
@@ -66,3 +67,12 @@ internal fun duoBlockedUrl(raw: String): Boolean {
     }
     return hostBlocked || termBlocked
 }
+
+
+/** Shared, cache-free block response for main browser and sign-in WebViews. */
+internal fun duoBlockResponseHtml(): String = """<!doctype html><meta charset="utf-8"><meta name="viewport" content="width=device-width"><title>Blocked</title><body style="font-family:sans-serif;background:#111;color:#eee;padding:24px"><h2>DUO Safe Browsing</h2><p>This page or request was blocked because it may contain adult content.</p><p>Safe browsing protection is enabled.</p></body>"""
+
+internal fun duoBlockResponse(): WebResourceResponse = WebResourceResponse(
+    "text/html", "UTF-8", 403, "Blocked by DUO Safe Browsing",
+    mapOf("Cache-Control" to "no-store"), java.io.ByteArrayInputStream(duoBlockResponseHtml().toByteArray(Charsets.UTF_8))
+)

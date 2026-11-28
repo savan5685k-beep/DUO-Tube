@@ -8,6 +8,7 @@ import android.content.ClipboardManager
 import android.content.Intent
 import android.graphics.Bitmap
 import android.net.Uri
+import android.net.http.SslError
 import android.os.Build
 import android.view.View
 import android.view.ViewGroup
@@ -16,6 +17,7 @@ import android.webkit.JavascriptInterface
 import android.webkit.URLUtil
 import android.webkit.WebChromeClient
 import android.webkit.WebResourceRequest
+import android.webkit.SslErrorHandler
 import android.webkit.WebResourceResponse
 import android.webkit.WebSettings
 import android.webkit.WebView
@@ -84,13 +86,6 @@ import org.koin.compose.koinInject
 import org.koin.compose.viewmodel.koinViewModel
 
 
-
-// DUO Safe Browsing filter lives in BrowserContentFilter.kt and is covered by unit tests.
-private fun duoBlockResponseHtml(): String = """<!doctype html><meta charset="utf-8"><meta name="viewport" content="width=device-width"><title>Blocked</title><body style="font-family:sans-serif;background:#111;color:#eee;padding:24px"><h2>DUO Safe Browsing</h2><p>This page or request was blocked because it may contain adult content.</p><p>Safe browsing protection is enabled.</p></body>"""
-private fun duoBlockResponse(): WebResourceResponse = WebResourceResponse(
-    "text/html", "UTF-8", 403, "Blocked by DUO Safe Browsing",
-    mapOf("Cache-Control" to "no-store"), java.io.ByteArrayInputStream(duoBlockResponseHtml().toByteArray(Charsets.UTF_8))
-)
 
 private val YT_WATCH = Regex("""youtube\.com/(watch\?|shorts/)|youtu\.be/""")
 
@@ -361,7 +356,7 @@ fun BrowserScreen(
                         settings.useWideViewPort = true
                         settings.builtInZoomControls = true
                         settings.displayZoomControls = false
-                        settings.mixedContentMode = WebSettings.MIXED_CONTENT_COMPATIBILITY_MODE
+                        settings.mixedContentMode = WebSettings.MIXED_CONTENT_NEVER_ALLOW
                         // Ad scripts open pop-ups/pop-unders on any tap; only real links the user tapped may open.
                         settings.javaScriptCanOpenWindowsAutomatically = false
                         settings.setSupportMultipleWindows(true)
@@ -423,6 +418,11 @@ fun BrowserScreen(
                                 }
                                 runCatching { view.context.startActivity(intent) }.onFailure { if (fallback != null) view.loadUrl(fallback) }
                                 return true
+                            }
+
+                            override fun onReceivedSslError(view: WebView, handler: SslErrorHandler, error: SslError) {
+                                // Never allow a page to override certificate validation errors.
+                                handler.cancel()
                             }
 
                             override fun onPageStarted(view: WebView, url: String, favicon: Bitmap?) {

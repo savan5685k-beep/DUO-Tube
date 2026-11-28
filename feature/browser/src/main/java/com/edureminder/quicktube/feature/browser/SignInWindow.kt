@@ -3,11 +3,15 @@ package com.edureminder.quicktube.feature.browser
 import android.annotation.SuppressLint
 import android.content.Context
 import android.graphics.Bitmap
+import android.net.http.SslError
+import android.os.Build
 import android.os.Message
 import android.view.ViewGroup
 import android.webkit.CookieManager
 import android.webkit.WebChromeClient
 import android.webkit.WebResourceRequest
+import android.webkit.WebResourceResponse
+import android.webkit.SslErrorHandler
 import android.webkit.WebSettings
 import android.webkit.WebView
 import android.webkit.WebViewClient
@@ -85,7 +89,8 @@ internal class SignInWindows(private val context: Context, private val onChange:
         val window = WebView(context).apply {
             layoutParams = ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT)
             applyBrowserSettings()
-            settings.mixedContentMode = WebSettings.MIXED_CONTENT_COMPATIBILITY_MODE
+            settings.mixedContentMode = WebSettings.MIXED_CONTENT_NEVER_ALLOW
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) settings.safeBrowsingEnabled = true
             settings.javaScriptCanOpenWindowsAutomatically = true
             webChromeClient = object : WebChromeClient() {
                 // The sign-in page closes itself when it's done; the page behind then knows the user.
@@ -95,13 +100,32 @@ internal class SignInWindows(private val context: Context, private val onChange:
                 private var checked = false
 
                 override fun onPageStarted(view: WebView, url: String, favicon: Bitmap?) {
+                    if (duoBlockedUrl(url)) {
+                        view.stopLoading()
+                        view.loadDataWithBaseURL(null, duoBlockResponseHtml(), "text/html", "UTF-8", null)
+                        return
+                    }
                     if (checked || !url.startsWith("http")) return
                     checked = true
                     if (!isSignInUrl(url)) close()
                 }
 
+                override fun shouldInterceptRequest(view: WebView, request: WebResourceRequest): WebResourceResponse? =
+                    if (duoBlockedUrl(request.url.toString())) duoBlockResponse() else null
+
+                override fun onReceivedSslError(view: WebView, handler: SslErrorHandler, error: SslError) {
+                    handler.cancel()
+                }
+
                 // Other apps (intent:, market:) stay closed from here.
-                override fun shouldOverrideUrlLoading(view: WebView, request: WebResourceRequest) = !request.url.toString().startsWith("http")
+                override fun shouldOverrideUrlLoading(view: WebView, request: WebResourceRequest): Boolean {
+                    val url = request.url.toString()
+                    if (duoBlockedUrl(url)) {
+                        view.loadDataWithBaseURL(null, duoBlockResponseHtml(), "text/html", "UTF-8", null)
+                        return true
+                    }
+                    return !url.startsWith("http")
+                }
 
                 override fun onPageFinished(view: WebView, url: String) {
                     CookieManager.getInstance().flush()
