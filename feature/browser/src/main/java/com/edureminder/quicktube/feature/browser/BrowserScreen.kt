@@ -84,35 +84,7 @@ import org.koin.compose.viewmodel.koinViewModel
 
 
 
-// DUO Safe Browsing: conservative adult-site block list and search-term guard.
-// This is a protective filter, not a complete internet-level parental control.
-private val DUO_BLOCKED_HOSTS = setOf(
-    "pornhub.com", "xvideos.com", "xnxx.com", "xhamster.com", "redtube.com",
-    "youporn.com", "tube8.com", "spankbang.com", "spankwire.com", "eporner.com",
-    "tnaflix.com", "beeg.com", "porntrex.com", "porn.com", "rule34.xxx",
-    "chaturbate.com", "stripchat.com", "livejasmin.com", "cam4.com", "myfreecams.com",
-    "onlyfans.com", "fansly.com", "manyvids.com", "nhentai.net", "hentaihaven.xxx",
-    "hanime.tv", "hentaistream.com", "f95zone.to", "literotica.com", "sex.com",
-    "adultfriendfinder.com", "ashleymadison.com", "brazzers.com", "bangbros.com",
-    "mofos.com", "naughtyamerica.com", "realitykings.com", "digitalplayground.com",
-    "javhd.com", "javlibrary.com", "avgle.com", "sxyprn.com", "motherless.com",
-    "heavy-r.com", "ixxx.com", "porndig.com", "pornhub.org", "pornhub.net",
-    "xvideos2.com", "xvideos3.com", "xnxx2.com", "xnxx3.com"
-)
-private val DUO_BLOCKED_TERMS = Regex(
-    "(?i)(\\b(porn|porno|pornography|xxx|sexcam|webcamsex|hentai|rule34|nsfw|adultcontent|adult-content|erotic|explicit-content|sex-content)\\b)"
-)
-private fun duoBlockedUrl(raw: String): Boolean {
-    val uri = runCatching { Uri.parse(raw) }.getOrNull() ?: return false
-    val host = uri.host?.lowercase()?.trimEnd('.')?.removePrefix("www.") ?: return false
-    // Only HTTP(S) pages are considered here. Host matching is exact or a true subdomain
-    // suffix (never a substring such as "notpornhub.com").
-    val scheme = uri.scheme?.lowercase()
-    val hostBlocked = (scheme == "http" || scheme == "https") &&
-        DUO_BLOCKED_HOSTS.any { host == it || host.endsWith(".$it") }
-    val textBlocked = DUO_BLOCKED_TERMS.containsMatchIn(raw)
-    return hostBlocked || textBlocked
-}
+// DUO Safe Browsing filter lives in BrowserContentFilter.kt and is covered by unit tests.
 private fun duoBlockResponseHtml(): String = """<!doctype html><meta charset="utf-8"><meta name="viewport" content="width=device-width"><title>Blocked</title><body style="font-family:sans-serif;background:#111;color:#eee;padding:24px"><h2>DUO Safe Browsing</h2><p>This page or request was blocked because it may contain adult content.</p><p>Safe browsing protection is enabled.</p></body>"""
 private fun duoBlockResponse(): WebResourceResponse = WebResourceResponse(
     "text/html", "UTF-8", 403, "Blocked by DUO Safe Browsing",
