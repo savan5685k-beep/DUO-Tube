@@ -46,8 +46,6 @@ import com.edureminder.quicktube.core.model.ThemeMode
 import com.edureminder.quicktube.core.navigation.DownloadingRoute
 import com.edureminder.quicktube.core.navigation.LibraryRoute
 import com.edureminder.quicktube.core.navigation.PlayerRoute
-import com.edureminder.quicktube.core.update.UpdateManager
-import com.edureminder.quicktube.core.update.UpdatePrompt
 import com.edureminder.quicktube.navigation.AppNavHost
 import com.edureminder.quicktube.player.FloatingPlayerActivity
 import com.edureminder.quicktube.core.navigation.VideoRoute
@@ -62,20 +60,12 @@ class MainActivity : ComponentActivity() {
     private val router: UrlRouter by inject()
     private val sheet: DownloadSheetController by inject()
     private val player: PlayerController by inject()
-    private val updates: UpdateManager by inject()
     private var pendingIntent by mutableStateOf<Intent?>(null)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         player.connect()
-        // Look for a new GitHub release (throttled; release builds only unless the URL was overridden for testing).
-        if (savedInstanceState == null) {
-            updates.cleanUpInstalledUpdates()
-            updates.consumeJustUpdated()?.let { v ->
-                android.widget.Toast.makeText(this, "DUO updated to $v", android.widget.Toast.LENGTH_SHORT).show()
-            }
-        }
         if (savedInstanceState == null) pendingIntent = intent
         setContent {
             var showWelcome by remember { mutableStateOf(savedInstanceState == null) }
@@ -102,7 +92,6 @@ class MainActivity : ComponentActivity() {
                 androidx.activity.compose.BackHandler { moveTaskToBack(true) }
                 Box(Modifier.fillMaxSize()) {
                     AppNavHost(nav)
-                    if (!showWelcome) UpdatePrompt()
                     if (showWelcome) WelcomeScreen()
                 }
             }
