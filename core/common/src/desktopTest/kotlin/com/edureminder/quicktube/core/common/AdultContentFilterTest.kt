@@ -8,10 +8,22 @@ import org.junit.Test
 
 class AdultContentFilterTest {
     @Test
-    fun blocksExplicitTermsAndKnownAdultSiteNames() {
-        listOf("porn", "pornography", "sex", "nsfw", "hentai", "xvideos", "xnxx", "onlyfans", "fansly").forEach {
-            assertTrue("Expected blocked term: $it", AdultContentFilter.isBlockedText(it))
+    fun blocksExplicitTermsAndKnownAdultSiteNamesInSearches() {
+        listOf("porn", "pornography", "sex", "nsfw", "hentai").forEach {
+            assertTrue("Expected explicit term: $it", AdultContentFilter.isBlockedText(it))
         }
+        listOf("xvideos", "xnxx", "onlyfans", "fansly").forEach {
+            assertTrue("Expected blocked site name: $it", AdultContentFilter.isBlockedSearchText(it))
+        }
+    }
+
+    @Test
+    fun blocksAdultHostsButNotLookalikeUrlSuffixesOrSiteNamesInQueries() {
+        assertTrue(AdultContentFilter.isBlockedUrlOrText("https://sub.onlyfans.com/path"))
+        assertFalse(AdultContentFilter.isBlockedUrlOrText("https://notpornhub.com/"))
+        assertFalse(AdultContentFilter.isBlockedUrlOrText("https://pornhub.com.example.org/"))
+        assertFalse(AdultContentFilter.isBlockedUrlOrText("https://example.org/?site=pornhub.com"))
+        assertTrue(AdultContentFilter.isBlockedUrlOrText("https://example.org/?q=sex"))
     }
 
     @Test

@@ -94,7 +94,7 @@ fun SearchResultsScreen(
             }
             LazyRow(contentPadding = PaddingValues(horizontal = 16.dp, vertical = 6.dp), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                 items(inAppFilters) { (f, label) -> QtChip(label, ui.filter == f, { vm.load(f) }) }
-                items(if (AdultContentFilter.isBlockedText(query)) emptyList() else webSearches(query)) { (label, url) ->
+                items(if (AdultContentFilter.isBlockedSearchText(query)) emptyList() else webSearches(query)) { (label, url) ->
                     Row(
                         Modifier.height(36.dp).clip(RoundedCornerShape(50)).background(MaterialTheme.colorScheme.surfaceContainerHigh)
                             .pressable(scaleDown = 0.94f, onClick = { onOpenUrl(url) }).padding(start = 5.dp, end = 12.dp),

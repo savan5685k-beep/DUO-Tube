@@ -79,12 +79,17 @@ fun SearchScreen(
     fun submit(text: String) {
         val t = text.trim()
         if (t.isEmpty()) return
-        if (AdultContentFilter.isBlockedText(t)) {
-            voiceError = AdultContentFilter.BLOCKED_MESSAGE
-            return
-        }
-        if (Urls.looksLikeUrl(t)) onDownloadUrl(Urls.normalize(t))
-        else {
+        if (Urls.looksLikeUrl(t)) {
+            if (AdultContentFilter.isBlockedUrlOrText(t)) {
+                voiceError = AdultContentFilter.BLOCKED_MESSAGE
+                return
+            }
+            onDownloadUrl(Urls.normalize(t))
+        } else {
+            if (AdultContentFilter.isBlockedSearchText(t)) {
+                voiceError = AdultContentFilter.BLOCKED_MESSAGE
+                return
+            }
             vm.remember(t)
             onSearch(t)
         }

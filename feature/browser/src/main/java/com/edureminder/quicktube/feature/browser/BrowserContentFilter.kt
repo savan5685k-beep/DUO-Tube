@@ -11,26 +11,6 @@ import android.webkit.WebResourceResponse
  * This blocks known domains and explicit URL/search terms. It is not an image/video classifier
  * or a complete parental-control system; content hosted on allowed sites can still bypass it.
  */
-private val DUO_BLOCKED_HOSTS = setOf(
-    "pornhub.com", "xvideos.com", "xnxx.com", "xhamster.com", "redtube.com",
-    "youporn.com", "tube8.com", "spankbang.com", "spankwire.com", "eporner.com",
-    "tnaflix.com", "beeg.com", "porntrex.com", "porn.com", "rule34.xxx",
-    "chaturbate.com", "stripchat.com", "livejasmin.com", "cam4.com", "myfreecams.com",
-    "onlyfans.com", "fansly.com", "manyvids.com", "nhentai.net", "hentaihaven.xxx",
-    "hanime.tv", "hentaistream.com", "f95zone.to", "literotica.com", "sex.com",
-    "adultfriendfinder.com", "ashleymadison.com", "brazzers.com", "bangbros.com",
-    "mofos.com", "naughtyamerica.com", "realitykings.com", "digitalplayground.com",
-    "javhd.com", "javlibrary.com", "avgle.com", "sxyprn.com", "motherless.com",
-    "heavy-r.com", "ixxx.com", "porndig.com", "pornhub.org", "pornhub.net",
-    "xvideos2.com", "xvideos3.com", "xnxx2.com", "xnxx3.com",
-    "porn300.com", "porn555.com", "pornhd.com", "pornhits.com", "pornovideos.com",
-    "sexvid.com", "sexvideos.com", "sexstories.com", "hentai.xxx", "hentai.tv",
-    "hentaifox.com", "hentai2read.com", "hentaiworld.tv", "hentaitube.com",
-    "yavtube.com", "jav.guru", "javmost.com", "javbus.com", "javbooks.com",
-    "adultdvdempire.com", "adulttime.com", "xart.com", "fapello.com", "fap.to",
-    "redgifs.com", "gifs.com"
-)
-
 private fun normalizedHost(uri: URI): String? {
     var host = uri.host
     if (host.isNullOrBlank()) {
@@ -50,8 +30,7 @@ internal fun duoBlockedUrl(raw: String): Boolean {
     val uri = runCatching { URI(raw) }.getOrNull()
     val scheme = uri?.scheme?.lowercase()
     val host = uri?.let(::normalizedHost)
-    val hostBlocked = (scheme == "http" || scheme == "https") && host != null &&
-        DUO_BLOCKED_HOSTS.any { host == it || host.endsWith(".$it") }
+    val hostBlocked = (scheme == "http" || scheme == "https") && host != null && AdultContentFilter.isBlockedHost(host)
 
     // Decode at most twice to catch ordinary and double-encoded search terms without unbounded decoding.
     var candidate = raw

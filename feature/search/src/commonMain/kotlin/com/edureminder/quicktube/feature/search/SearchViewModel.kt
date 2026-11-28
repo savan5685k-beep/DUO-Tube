@@ -26,7 +26,7 @@ class SearchViewModel(
     val query = MutableStateFlow("")
     val recent = history.recent.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
     val suggestions: StateFlow<List<String>> = query.debounce(200).distinctUntilChanged().mapLatest { q ->
-        if (q.isBlank() || AdultContentFilter.isBlockedText(q)) emptyList() else runCatching { media.suggestions(q).filterNot { AdultContentFilter.isBlockedText(it) } }.getOrDefault(emptyList())
+        if (q.isBlank() || AdultContentFilter.isBlockedSearchText(q)) emptyList() else runCatching { media.suggestions(q).filterNot { AdultContentFilter.isBlockedSearchText(it) } }.getOrDefault(emptyList())
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
 
     val hot = listOf("Top hits", "Trending songs", "Lofi", "Workout music", "Cartoon", "Natok", "Cricket highlights", "Taylor Swift")
