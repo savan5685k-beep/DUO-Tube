@@ -427,11 +427,6 @@ fun BrowserScreen(
                         fetcher.webView = this
                         vm.openPage = { u -> post { loadUrl(u) } }
                         webViewClient = object : WebViewClient() {
-                            // Apply the protective filter to subresources/iframes as well as top-level navigations.
-                            override fun shouldInterceptRequest(view: WebView, request: WebResourceRequest): WebResourceResponse? {
-                                return if (duoBlockedUrl(request.url.toString())) duoBlockResponse() else super.shouldInterceptRequest(view, request)
-                            }
-
                             override fun shouldOverrideUrlLoading(view: WebView, request: WebResourceRequest): Boolean {
                                 val u = request.url.toString()
                                 if (duoBlockedUrl(u)) { view.loadDataWithBaseURL(null, duoBlockResponseHtml(), "text/html", "UTF-8", null); return true }
