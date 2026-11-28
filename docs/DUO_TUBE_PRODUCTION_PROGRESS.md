@@ -4,7 +4,7 @@ Updated: 2026-11-28
 
 ## Current main
 
-- SHA at this status update: 26ac32b4a4ea41450ff394888e1620e9aee03691.
+- SHA at this status update: cbfa0a23765e99b555e45672dcf1924d46a05f16 (documentation commit after the signing-pin changes).
 - Includes the branding, voice-search, privacy, security, filtering, and download-flow changes plus the QA-install workflow correction.
 
 
