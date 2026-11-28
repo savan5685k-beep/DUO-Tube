@@ -103,3 +103,10 @@ Production readiness is not declared.
 ## Navigation correction — 2026-11-28
 
 - User corrected the Status Saver tab position requirement: it must be **second**, directly after Download (not fourth). Updated `AppNavHost` order to Download, Status, Play, Gallery, Settings. Download-count badge moved to Play's new index (2). Commit `f0d27290`. CI/build pending.
+
+
+## CI failure root cause and fix — 2026-11-28
+
+- Investigated failing QA APK workflow run 46150919729. Root cause was a missing Compose import: `detectHorizontalDragGestures` was referenced from HomeScreen but unresolved in compilation.
+- Added explicit import and replaced fully qualified reference with imported function in commit `1d10fe3e0678d99eca1d3a728a3099d5a1ab267f`.
+- Fresh CI and APK workflows started for the fix commit. Validation remains pending; recheck before declaring fixed.
