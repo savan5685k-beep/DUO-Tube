@@ -40,6 +40,7 @@ actual fun VoiceSearchControl(
     onError: (String) -> Unit,
 ) {
     val context = LocalContext.current
+    val reportError = onError
     var listening by remember { mutableStateOf(false) }
     var recognizer by remember { mutableStateOf<SpeechRecognizer?>(null) }
     val pulse = rememberInfiniteTransition(label = "mic-pulse")
@@ -60,7 +61,7 @@ actual fun VoiceSearchControl(
     }
     fun startRecognition() {
         if (!SpeechRecognizer.isRecognitionAvailable(context)) {
-            onError("Voice recognition isn't available on this device.")
+            reportError("Voice recognition isn't available on this device.")
             return
         }
         recognizer?.cancel()
@@ -80,13 +81,13 @@ actual fun VoiceSearchControl(
                 listening = false
                 val spoken = results?.getStringArrayList(SpeechRecognizer.RESULTS_RECOGNITION)?.firstOrNull()?.trim()
                 if (!spoken.isNullOrBlank()) onResult(spoken)
-                else onError("No speech was recognized. Try again or type your search.")
+                else reportError("No speech was recognized. Try again or type your search.")
                 speech.destroy()
                 if (recognizer === speech) recognizer = null
             }
             override fun onError(error: Int) {
                 listening = false
-                if (error != SpeechRecognizer.ERROR_CLIENT) onError("Voice search couldn't recognize that. Try again or type your search.")
+                if (error != SpeechRecognizer.ERROR_CLIENT) reportError("Voice search couldn't recognize that. Try again or type your search.")
                 speech.destroy()
                 if (recognizer === speech) recognizer = null
             }
@@ -99,12 +100,12 @@ actual fun VoiceSearchControl(
             if (Build.VERSION.SDK_INT >= 34) putExtra("android.speech.extra.LANGUAGE_DETECTION_ALLOWED", true)
         }
         runCatching { speech.startListening(intent) }
-            .onFailure { listening = false; onError("Couldn't start voice recognition. Try typing your search.") }
+            .onFailure { listening = false; reportError("Couldn't start voice recognition. Try typing your search.") }
     }
 
     val permissionLauncher = rememberLauncherForActivityResult(ActivityResultContracts.RequestPermission()) { granted ->
         if (granted) startRecognition()
-        else onError("Microphone permission was denied. You can still search by typing.")
+        else reportError("Microphone permission was denied. You can still search by typing.")
     }
     DisposableEffect(Unit) {
         onDispose { recognizer?.cancel(); recognizer?.destroy(); recognizer = null }
