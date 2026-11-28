@@ -83,3 +83,18 @@ Production readiness is not declared.
 
 - User-rated current QA app 9/10 and reported a launch flash: Android system splash showed a dark background and app icon before the animated welcome. Android's system splash is platform-mandatory, so removed its drawable icon (transparent vector) to eliminate the unwanted logo flash; the welcome screen remains the app's own animation. This is a UI handoff improvement, not removal of the OS splash itself.
 - User's new requested backlog: persistent dismissed clipboard suggestion via right-swipe animation; advanced swipe-to-PiP and resizable PiP; background audio mode with thumbnail/headphones artwork and in-player return-to-video control; one tap Auto/double tap English/triple tap Hindi voice modes with append-to-existing-query behavior; crash investigation; repository-backed update checker and release workflow; in-app status photo/video viewer; status-owner display; move Status Saver to tab position 4 (next to Downloads). These are queued for scoped implementation and QA; no claim of completion yet.
+
+
+## User-requested 9/10 feedback iteration — 2026-11-28 (implementation in progress)
+
+- `743f0287`: system launch splash icon made transparent to remove the unwanted black/icon flash before welcome. Android's platform splash itself cannot be removed; its icon is now blank.
+- `ecdfbf6f` + `d9a60c07`: copied-link card's close button removed; rightward horizontal swipe dismisses the card and its dismissed URL is remembered with saveable state. The card uses the existing fade/shrink exit animation. CI validation pending.
+- `c8a4e4fb`: successive voice-search results now append to existing query text instead of replacing it.
+- `3e1e833e`: mic tap-count selection replaces the language popup: 1 tap Auto, 2 taps English (en-IN), 3+ taps Hindi (hi-IN), with a short tap aggregation window. Permission remains on-demand. CI validation pending.
+- `99627860`: About screen includes a Check for updates entry opening the official repository Releases page. No release is published yet; this is a manual official-source link, not an automatic APK installer/update mechanism.
+- `93ad72ce`: audio-only playback now shows current artwork behind a headphones icon. Existing player controls include the Watch/Listen toggle and floating PiP recall ("Show here").
+- Navigation inspection confirms Status Saver is already tab position 4, adjacent to Gallery and before Settings; no reorder was necessary.
+- Status Saver currently stores only file name/URI/media type/time/size. WhatsApp contact identity is not present in this folder metadata; displaying a status owner's contact name requires a supported, privacy-preserving source and is not yet implemented.
+- Status media still launches Android external viewers; an in-app status viewer remains pending. Advanced swipe-to-PiP remains pending; Android system PiP resize behavior and swipe entry need device-level testing.
+- Crash is not reproducible from the available information; no telemetry is enabled. Crash root cause remains unverified.
+- Latest workflow runs are pending/queued and earlier runs were cancelled by subsequent commits. No validation claim is made for these new commits until the latest main CI and APK workflows complete.
