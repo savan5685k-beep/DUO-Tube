@@ -60,7 +60,7 @@ class MainActivity : ComponentActivity() {
         if (savedInstanceState == null) {
             updates.cleanUpInstalledUpdates()
             updates.consumeJustUpdated()?.let { v ->
-                android.widget.Toast.makeText(this, "QuickTube updated to $v", android.widget.Toast.LENGTH_SHORT).show()
+                android.widget.Toast.makeText(this, "DUO updated to $v", android.widget.Toast.LENGTH_SHORT).show()
             }
         }
         if (savedInstanceState == null) pendingIntent = intent
@@ -100,7 +100,7 @@ class MainActivity : ComponentActivity() {
     override fun onUserLeaveHint() {
         super.onUserLeaveHint()
         // Leaving the app from a playing video (Settings → Player → Picture-in-picture): it goes on in the floating
-        // window, a task of its own, so opening QuickTube again doesn't close it.
+        // window, a task of its own, so opening DUO again doesn't close it.
         if (PipState.wanted.value && !PipState.floating.value) FloatingPlayerActivity.start(this)
     }
 
