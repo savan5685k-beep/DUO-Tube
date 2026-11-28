@@ -4,7 +4,7 @@ Updated: 2026-11-28
 
 ## Current main
 
-- SHA: a8872fc6ef0edac896414469bba33012fcc38a2d
+- SHA: 896b890a5421be02a65b8037105da388084f8ce4
 - Current main includes the branding, voice-search, privacy, security, search-suggestion, and download-flow changes plus a test fix for DUO metadata.
 
 ## Implemented
