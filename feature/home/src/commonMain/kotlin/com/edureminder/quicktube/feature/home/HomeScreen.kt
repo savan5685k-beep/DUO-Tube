@@ -111,7 +111,7 @@ class HomeActions(
     val openLocalPlaylist: (Long) -> Unit = {},
 )
 
-private val tabs = listOf("Search", "YouTube", "Music", "WhatsApp Saver")
+private val tabs = listOf("Search", "YouTube", "Music", "Status")
 
 @Composable
 fun HomeScreen(actions: HomeActions, modifier: Modifier = Modifier) {
@@ -131,6 +131,11 @@ fun HomeScreen(actions: HomeActions, modifier: Modifier = Modifier) {
             // The Search page warms the YouTube tab only when it shows the trending row (Settings → Trending on home).
             0 -> { if (vm.showTrending.value) vm.ensureFeed() }
             1 -> vm.ensureFeed()
+            3 -> {
+                // Open the actual Status screen directly, without the old interstitial landing page.
+                actions.openStatusSaver()
+                pager.scrollToPage(0)
+            }
         }
     }
 
@@ -143,7 +148,7 @@ fun HomeScreen(actions: HomeActions, modifier: Modifier = Modifier) {
                 0 -> DiscoverTab(vm, actions, onDownload = sheet::open, onSeeTrending = { scope.launch { pager.animateScrollToPage(1) } }, onSeeMusic = { scope.launch { pager.animateScrollToPage(2) } })
                 1 -> YouTubeTab(actions, onDownload = sheet::open, feedChips = { FeedChips(vm) }) { top -> FeedList(vm, actions, onDownload = sheet::open, top = top) }
                 2 -> MusicHome(actions, onDownload = sheet::open)
-                else -> MoreTab(actions)
+                else -> Box(Modifier.fillMaxSize())
             }
         }
     }
