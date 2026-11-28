@@ -204,6 +204,12 @@ fun AboutScreen(onBack: () -> Unit) {
             ) { androidx.compose.material3.Icon(QtIcons.Download, null, tint = MaterialTheme.colorScheme.onPrimary, modifier = Modifier.size(44.dp)) }
             Text("DUO Tube", style = BrandTitle.copy(brush = LocalQtExtras.current.brand))
             Text("Version ${appVersion(context)}", color = MaterialTheme.colorScheme.onSurfaceVariant)
+            QtCard(Modifier.padding(top = 16.dp)) {
+                NavRow(QtIcons.Refresh, "Check for updates", "View official DUO Tube releases on GitHub") {
+                    runCatching { context.startActivity(android.content.Intent(android.content.Intent.ACTION_VIEW,
+                        android.net.Uri.parse("https://github.com/savan5685k-beep/DUO-Tube/releases"))) }
+                }
+            }
             Text(
                 "Search, watch and save supported media from services you choose. " +
                     "Share supported media links with DUO Tube to save them locally.",
