@@ -32,6 +32,10 @@ expect fun QtBackHandler(enabled: Boolean = true, onBack: () -> Unit)
 @Composable
 expect fun rememberClipboardReader(): () -> String?
 
+/** Monotonic in-process signal when the clipboard content is newly copied, even for identical text. */
+@Composable
+expect fun rememberClipboardRevision(): Int
+
 /** A picked text file: its name (without the extension) and its text, or null when it couldn't be read. */
 class PickedText(val name: String, val text: String?)
 
