@@ -163,7 +163,7 @@ data class QtExtras(val isDark: Boolean, val brand: Brush, val brandStart: Color
 val LocalQtExtras = staticCompositionLocalOf { QtExtras(true, Brush.linearGradient(listOf(Color.Cyan, Color.Blue)), Color.Cyan, Color.Blue) }
 
 val BrandTitle: TextStyle
-    @Composable get() = TextStyle(fontFamily = Jakarta, fontSize = 42.sp, fontWeight = FontWeight.ExtraBold, letterSpacing = (-1.4).sp)
+    @Composable get() = TextStyle(fontFamily = FontFamily.SansSerif, fontSize = 42.sp, fontWeight = FontWeight.ExtraBold, letterSpacing = (-1.4).sp)
 
 @Composable
 fun QuickTubeTheme(
@@ -182,7 +182,7 @@ fun QuickTubeTheme(
     }
     val start = scheme.primary
     val end = if (wallpaper != null) scheme.tertiary else spec.partner
-    val family = Jakarta
+    val family = FontFamily.SansSerif
     val typography = remember(family) { typographyOf(family) }
     // Soft, accent-tinted ripple instead of the default grey splash.
     val ripple = RippleConfiguration(
