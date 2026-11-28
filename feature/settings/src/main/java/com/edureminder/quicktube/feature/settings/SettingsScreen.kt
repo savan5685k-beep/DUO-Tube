@@ -93,7 +93,7 @@ fun SettingsScreen(actions: SettingsActions) {
                 backup.import(text)
             }
             android.widget.Toast.makeText(
-                context, r.fold({ "Restored: " + it.summary() }, { it.message?.takeIf { m -> "QuickTube" in m } ?: "That file isn't a QuickTube backup" }),
+                context, r.fold({ "Restored: " + it.summary() }, { it.message?.takeIf { m -> "DUO" in m } ?: "That file isn't a DUO backup" }),
                 android.widget.Toast.LENGTH_LONG,
             ).show()
         }
@@ -178,13 +178,13 @@ fun SettingsScreen(actions: SettingsActions) {
             QtCard {
                 NavRow(QtIcons.Feedback, "Feedback", tint = Orange) {
                     context.startActivity(Intent.createChooser(Intent(Intent.ACTION_SENDTO, Uri.parse("mailto:"))
-                        .putExtra(Intent.EXTRA_SUBJECT, "QuickTube feedback"), "Send feedback"))
+                        .putExtra(Intent.EXTRA_SUBJECT, "DUO feedback"), "Send feedback"))
                 }
                 RowDivider()
-                NavRow(QtIcons.Share, "Share QuickTube", tint = Green) {
+                NavRow(QtIcons.Share, "Share DUO", tint = Green) {
                     context.startActivity(Intent.createChooser(Intent(Intent.ACTION_SEND).setType("text/plain").putExtra(
-                        Intent.EXTRA_TEXT, "Download videos and music with QuickTube: https://play.google.com/store/apps/details?id=${context.packageName}",
-                    ), "Share QuickTube"))
+                        Intent.EXTRA_TEXT, "Download videos and music with DUO: https://play.google.com/store/apps/details?id=${context.packageName}",
+                    ), "Share DUO"))
                 }
                 RowDivider()
                 NavRow(QtIcons.Downloading, "Check for updates", updateSummary, tint = Teal) { updates.checkOrShow() }
