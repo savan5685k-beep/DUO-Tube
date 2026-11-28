@@ -24,7 +24,7 @@ object UpdateParsing {
 
     /**
      * Picks the APK built for this phone's CPU ([abis], most preferred first, e.g. `Build.SUPPORTED_ABIS`):
-     * `QuickTube-v1.0.9-arm64-v8a.apk`, falling back to the universal `QuickTube-v1.0.9.apk`. Each APK's
+     * `DUO-v1.0.9-arm64-v8a.apk`, falling back to the universal `DUO-v1.0.9.apk`. Each APK's
      * checksum is the asset named `<apk>.sha256`.
      */
     fun parseRelease(json: String, abis: List<String> = emptyList()): UpdateInfo? {
