@@ -6,6 +6,12 @@ on:
   push:
     branches: [production]
   workflow_dispatch:
+    inputs:
+      publish_release:
+        description: 'Publish a public GitHub Release after the signed build passes'
+        required: true
+        type: boolean
+        default: false
 
 concurrency:
   group: release
@@ -75,7 +81,7 @@ jobs:
 
       - name: Verify signatures and collect the APKs
         env:
-          EXPECTED_CERT_SHA256: 45f117b4c36b2c5c9592a50faa5c572c2415d7b3d25d0f4ea19eda980b5dc88ca
+          EXPECTED_CERT_SHA256: 45f117b4c36b2c5c9592a50faa5c572c2415d7b3d25d0f4ea19eda980b5dc8c
         run: |
           dir=app/build/outputs/apk/release
           ls -la "$dir"
@@ -110,7 +116,16 @@ jobs:
           done
           ls -la dist
 
+      - name: Upload signed APKs for QA
+        uses: actions/upload-artifact@v4
+        with:
+          name: duo-signed-apks
+          path: dist/*
+          if-no-files-found: error
+          retention-days: 7
+
       - name: Publish GitHub Release
+        if: inputs.publish_release == true
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
