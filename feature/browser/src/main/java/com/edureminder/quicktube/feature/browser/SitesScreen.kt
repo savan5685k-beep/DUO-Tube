@@ -89,7 +89,7 @@ fun SitesScreen(onBack: () -> Unit, onOpen: (String) -> Unit, onHistory: () -> U
                             if (s.url == BUILT_IN_YOUTUBE_URL) SiteTag("Recommended", MaterialTheme.colorScheme.primary)
                         }
                         Text(when {
-                            s.url == BUILT_IN_YOUTUBE_URL -> "Built into QuickTube"
+                            s.url == BUILT_IN_YOUTUBE_URL -> "Built into DUO Tube"
                             s.url.startsWith("quicktube://") -> "Built-in tool"
                             else -> s.url
                         }, style = MaterialTheme.typography.bodySmall,
