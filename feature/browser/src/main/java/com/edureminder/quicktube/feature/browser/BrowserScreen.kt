@@ -8,6 +8,7 @@ import android.content.ClipboardManager
 import android.content.Intent
 import android.graphics.Bitmap
 import android.net.Uri
+import android.os.Build
 import android.view.View
 import android.view.ViewGroup
 import android.webkit.CookieManager
@@ -353,7 +354,8 @@ fun BrowserScreen(
                         layoutParams = ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT)
                         applyBrowserSettings()
                         CookieManager.getInstance().setAcceptThirdPartyCookies(this, false)
-                        settings.safeBrowsingEnabled = true
+                        // Safe Browsing's platform setting exists from Android 8 (API 26); minSdk is 24.
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) settings.safeBrowsingEnabled = true
                         settings.mediaPlaybackRequiresUserGesture = false
                         settings.loadWithOverviewMode = true
                         settings.useWideViewPort = true
