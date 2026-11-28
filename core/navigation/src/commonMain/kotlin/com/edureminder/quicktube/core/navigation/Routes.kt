@@ -23,7 +23,6 @@ import kotlinx.serialization.Serializable
 @Serializable data class LocalPlaylistRoute(val id: Long)
 @Serializable data class BulkJobRoute(val id: Long)
 @Serializable data class HowToRoute(val platform: String)
-@Serializable data object GamesRoute
 
 // Browser
 /** [autoDownload]: open the download sheet by itself once the page's video is found (pasted/shared links). */
