@@ -26,7 +26,7 @@ sealed interface UpdateState {
     data object Checking : UpdateState
     data object UpToDate : UpdateState
     data class Available(val info: UpdateInfo) : UpdateState
-    /** Android 8+: the user must allow "install unknown apps" for QuickTube first. */
+    /** Android 8+: the user must allow "install unknown apps" for DUO first. */
     data class NeedsPermission(val info: UpdateInfo) : UpdateState
     data class Downloading(val info: UpdateInfo, val bytes: Long, val total: Long) : UpdateState
     /** Handed to Android's installer; [needsTap] when Android waits for the user to confirm (its dialog, or our notification). */
@@ -126,7 +126,7 @@ class UpdateManager(
     fun cleanUpInstalledUpdates() {
         val installed = currentVersionCode
         File(context.cacheDir, "updates").listFiles()?.forEach { f ->
-            val code = Regex("^QuickTube-(\\d+)\\.apk").find(f.name)?.groupValues?.get(1)?.toLongOrNull()
+            val code = Regex("^DUO-(\\d+)\\.apk").find(f.name)?.groupValues?.get(1)?.toLongOrNull()
             if (code == null || code <= installed) f.delete()
         }
         // Forget a release we already have, so it's never offered again.
@@ -176,7 +176,7 @@ class UpdateManager(
 
     fun canInstall(): Boolean = Build.VERSION.SDK_INT < 26 || context.packageManager.canRequestPackageInstalls()
 
-    /** Opens Android's "Install unknown apps" switch for QuickTube. */
+    /** Opens Android's "Install unknown apps" switch for DUO. */
     fun permissionIntent(): Intent =
         Intent(android.provider.Settings.ACTION_MANAGE_UNKNOWN_APP_SOURCES, android.net.Uri.parse("package:${context.packageName}"))
 
@@ -255,7 +255,7 @@ class UpdateManager(
 
     /**
      * Runs in the new version right after it replaced this one (when the phone delivers it: some limit apps started
-     * in the background). After an update started in the app, a "QuickTube updated · tap to open" notification is
+     * in the background). After an update started in the app, a "DUO updated · tap to open" notification is
      * left; Android's installer screen itself ends with an "Open" button.
      */
     internal fun onReplaced() {
@@ -269,7 +269,7 @@ class UpdateManager(
 
     /**
      * The installer's "done" (PackageInstaller session path), received by the new version with permission to open an
-     * activity: QuickTube opens again by itself.
+     * activity: DUO opens again by itself.
      */
     internal fun onInstalled() {
         onReplaced()
@@ -282,10 +282,10 @@ class UpdateManager(
 
     private suspend fun download(info: UpdateInfo): File {
         val dir = File(context.cacheDir, "updates").apply { mkdirs() }
-        dir.listFiles()?.filter { !it.name.startsWith("QuickTube-${info.versionCode}") }?.forEach { it.delete() }
-        val target = File(dir, "QuickTube-${info.versionCode}.apk")
+        dir.listFiles()?.filter { !it.name.startsWith("DUO-${info.versionCode}") }?.forEach { it.delete() }
+        val target = File(dir, "DUO-${info.versionCode}.apk")
         if (target.exists() && (info.apkSize <= 0 || target.length() == info.apkSize)) return target
-        val part = File(dir, "QuickTube-${info.versionCode}.apk.part")
+        val part = File(dir, "DUO-${info.versionCode}.apk.part")
         var done = if (part.exists()) part.length() else 0L
         val req = Request.Builder().url(info.apkUrl).apply { if (done > 0) header("Range", "bytes=$done-") }.build()
         http.newCall(req).execute().use { r ->
@@ -330,7 +330,7 @@ class UpdateManager(
         if (versionCode(archive) <= currentVersionCode) { apk.delete(); error("This version is already installed") }
         val mine = signatures(packageInfo(context.packageName))
         val theirs = signatures(archive)
-        if (mine.isEmpty() || mine != theirs) { apk.delete(); error("This update isn't signed by QuickTube. It was not installed.") }
+        if (mine.isEmpty() || mine != theirs) { apk.delete(); error("This update isn't signed by DUO. It was not installed.") }
     }
 
     @Suppress("DEPRECATION")
