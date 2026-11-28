@@ -3,6 +3,7 @@ package com.edureminder.quicktube.feature.search
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.edureminder.quicktube.core.data.MediaRepository
+import com.edureminder.quicktube.core.common.AdultContentFilter
 import com.edureminder.quicktube.core.data.SearchHistoryRepository
 import com.edureminder.quicktube.core.model.MediaItem
 import com.edureminder.quicktube.core.model.SearchFilter
@@ -25,7 +26,7 @@ class SearchViewModel(
     val query = MutableStateFlow("")
     val recent = history.recent.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
     val suggestions: StateFlow<List<String>> = query.debounce(200).distinctUntilChanged().mapLatest { q ->
-        if (q.isBlank()) emptyList() else runCatching { media.suggestions(q) }.getOrDefault(emptyList())
+        if (q.isBlank() || AdultContentFilter.isBlockedText(q)) emptyList() else runCatching { media.suggestions(q) }.getOrDefault(emptyList())
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
 
     val hot = listOf("Top hits", "Trending songs", "Lofi", "Workout music", "Cartoon", "Natok", "Cricket highlights", "Taylor Swift")
@@ -56,6 +57,10 @@ class SearchResultsViewModel(private val media: MediaRepository) : ViewModel() {
     }
 
     fun load(filter: SearchFilter) {
+        if (AdultContentFilter.isBlockedText(query)) {
+            _ui.value = ResultsUi(filter = filter, loading = false, error = AdultContentFilter.BLOCKED_MESSAGE)
+            return
+        }
         _ui.value = ResultsUi(filter = filter, loading = true)
         viewModelScope.launch {
             runCatching { media.search(query, filter) }
@@ -66,7 +71,7 @@ class SearchResultsViewModel(private val media: MediaRepository) : ViewModel() {
 
     fun loadMore() {
         val s = _ui.value
-        if (s.loading || s.loadingMore || s.nextPage == null) return
+        if (AdultContentFilter.isBlockedText(query) || s.loading || s.loadingMore || s.nextPage == null) return
         _ui.update { it.copy(loadingMore = true) }
         viewModelScope.launch {
             runCatching { media.search(query, s.filter, s.nextPage) }

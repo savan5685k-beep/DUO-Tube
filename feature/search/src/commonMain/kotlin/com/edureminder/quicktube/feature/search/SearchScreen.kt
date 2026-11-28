@@ -54,6 +54,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.edureminder.quicktube.core.common.Urls
+import com.edureminder.quicktube.core.common.AdultContentFilter
 import com.edureminder.quicktube.core.designsystem.SectionHeader
 import org.koin.compose.viewmodel.koinViewModel
 
@@ -78,6 +79,10 @@ fun SearchScreen(
     fun submit(text: String) {
         val t = text.trim()
         if (t.isEmpty()) return
+        if (AdultContentFilter.isBlockedText(t)) {
+            voiceError = AdultContentFilter.BLOCKED_MESSAGE
+            return
+        }
         if (Urls.looksLikeUrl(t)) onDownloadUrl(Urls.normalize(t))
         else {
             vm.remember(t)
@@ -167,7 +172,7 @@ fun SearchScreen(
     voiceError?.let { message ->
         AlertDialog(
             onDismissRequest = { voiceError = null },
-            title = { Text("Voice search") },
+            title = { Text(if (AdultContentFilter.isBlockedText(field.text)) "DUO Safe Browsing" else "Voice search") },
             text = { Text(message) },
             confirmButton = { TextButton(onClick = { voiceError = null }) { Text("OK") } },
         )

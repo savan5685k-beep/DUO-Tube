@@ -65,6 +65,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewModelScope
 import com.edureminder.quicktube.core.common.Format
 import com.edureminder.quicktube.core.data.MediaRepository
+import com.edureminder.quicktube.core.common.AdultContentFilter
 import com.edureminder.quicktube.core.data.SearchHistoryRepository
 import com.edureminder.quicktube.core.designsystem.LocalBottomBarHeight
 import com.edureminder.quicktube.core.designsystem.QtChip
@@ -115,7 +116,7 @@ class YouTubeSearchViewModel(
     val typed = MutableStateFlow("")
     val recent = history.recent.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
     val suggestions: StateFlow<List<String>> = typed.debounce(200).distinctUntilChanged().mapLatest { q ->
-        if (q.isBlank()) emptyList() else runCatching { media.suggestions(q) }.getOrDefault(emptyList())
+        if (q.isBlank() || AdultContentFilter.isBlockedText(q)) emptyList() else runCatching { media.suggestions(q) }.getOrDefault(emptyList())
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
 
     private val _ui = MutableStateFlow(YtSearchUi())
@@ -126,8 +127,12 @@ class YouTubeSearchViewModel(
         val q = query.trim()
         if (q.isEmpty()) return
         typed.value = q
-        viewModelScope.launch { history.add(q) }
         job?.cancel()
+        if (AdultContentFilter.isBlockedText(q)) {
+            _ui.value = YtSearchUi(query = q, filter = filter, error = AdultContentFilter.BLOCKED_MESSAGE)
+            return
+        }
+        viewModelScope.launch { history.add(q) }
         _ui.value = YtSearchUi(query = q, filter = filter, loading = true)
         job = viewModelScope.launch {
             runCatching { media.search(q, filter) }
@@ -144,7 +149,7 @@ class YouTubeSearchViewModel(
     fun loadMore() {
         val s = _ui.value
         val q = s.query ?: return
-        if (s.loading || s.loadingMore || s.nextPage == null) return
+        if (AdultContentFilter.isBlockedText(q) || s.loading || s.loadingMore || s.nextPage == null) return
         _ui.update { it.copy(loadingMore = true) }
         job = viewModelScope.launch {
             runCatching { media.search(q, s.filter, s.nextPage) }

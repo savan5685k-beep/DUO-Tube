@@ -44,6 +44,7 @@ import com.edureminder.quicktube.core.model.SearchFilter
 import com.edureminder.quicktube.core.ui.EmptyBox
 import com.edureminder.quicktube.core.ui.ErrorBox
 import com.edureminder.quicktube.core.ui.FooterLoading
+import com.edureminder.quicktube.core.common.AdultContentFilter
 import com.edureminder.quicktube.core.ui.LoadingBox
 import com.edureminder.quicktube.core.ui.MediaRow
 import com.edureminder.quicktube.core.ui.OnNearEnd
@@ -56,13 +57,12 @@ private val inAppFilters = listOf(
     SearchFilter.CHANNELS to "Channels", SearchFilter.MUSIC to "Music",
 )
 
-private fun webSearches(q: String): List<Pair<String, String>> {
+internal fun webSearches(q: String): List<Pair<String, String>> {
     val e = URLEncoder.encode(q, "UTF-8")
     return listOf(
-        "Google" to "https://www.google.com/search?q=$e&tbm=vid",
-        "TikTok" to "https://www.tiktok.com/search?q=$e",
-        "Facebook" to "https://m.facebook.com/search/videos/?q=$e",
+        "YouTube" to "https://m.youtube.com/results?search_query=$e",
         "Instagram" to "https://www.instagram.com/explore/search/keyword/?q=$e",
+        "Facebook" to "https://m.facebook.com/search/videos/?q=$e",
     )
 }
 
@@ -94,7 +94,7 @@ fun SearchResultsScreen(
             }
             LazyRow(contentPadding = PaddingValues(horizontal = 16.dp, vertical = 6.dp), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                 items(inAppFilters) { (f, label) -> QtChip(label, ui.filter == f, { vm.load(f) }) }
-                items(webSearches(query)) { (label, url) ->
+                items(if (AdultContentFilter.isBlockedText(query)) emptyList() else webSearches(query)) { (label, url) ->
                     Row(
                         Modifier.height(36.dp).clip(RoundedCornerShape(50)).background(MaterialTheme.colorScheme.surfaceContainerHigh)
                             .pressable(scaleDown = 0.94f, onClick = { onOpenUrl(url) }).padding(start = 5.dp, end = 12.dp),

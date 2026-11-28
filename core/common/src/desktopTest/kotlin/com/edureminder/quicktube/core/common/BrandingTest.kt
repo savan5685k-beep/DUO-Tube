@@ -7,8 +7,8 @@ import org.junit.Test
 class BrandingTest {
     @Test
     fun suffixIsAddedOnceAndSafeEverywhere() {
-        assertEquals("Song(720p) - QuickTube edureminder.com", Branding.fileName("Song(720p)"))
-        assertEquals("Song - QuickTube edureminder.com", Branding.fileName(Branding.fileName("Song")))
+        assertEquals("Song(720p) - DUO Tube", Branding.fileName("Song(720p)"))
+        assertEquals("Song - DUO Tube", Branding.fileName(Branding.fileName("Song")))
         // Nothing FAT32, Windows or Android forbids in a name.
         assertTrue(Branding.FILE_SUFFIX.none { it in "\\/:*?\"<>|" || it.code < 32 })
     }

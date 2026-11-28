@@ -2,7 +2,7 @@ package com.edureminder.quicktube.feature.browser
 
 import java.net.IDN
 import java.net.URI
-import java.net.URLDecoder
+import com.edureminder.quicktube.core.common.AdultContentFilter
 import android.webkit.WebResourceResponse
 
 /**
@@ -31,10 +31,6 @@ private val DUO_BLOCKED_HOSTS = setOf(
     "redgifs.com", "gifs.com"
 )
 
-private val DUO_BLOCKED_TERMS = Regex(
-    """(?i)(?<![a-z0-9])(?:porn(?:ography|ographic)?|porno|xxx|sex|sexcam|webcamsex|hentai|rule34|nsfw|adult(?:[-_ ]?content)?|erotic|explicit(?:[-_ ]?content)?|sexual[-_ ]?content|sex[-_ ]?content)(?![a-z0-9])"""
-)
-
 private fun normalizedHost(uri: URI): String? {
     var host = uri.host
     if (host.isNullOrBlank()) {
@@ -59,12 +55,7 @@ internal fun duoBlockedUrl(raw: String): Boolean {
 
     // Decode at most twice to catch ordinary and double-encoded search terms without unbounded decoding.
     var candidate = raw
-    val termBlocked = (0..2).any {
-        val matched = DUO_BLOCKED_TERMS.containsMatchIn(candidate)
-        if (matched) return@any true
-        candidate = runCatching { URLDecoder.decode(candidate, "UTF-8") }.getOrDefault(candidate)
-        false
-    }
+    val termBlocked = AdultContentFilter.isBlockedText(raw)
     return hostBlocked || termBlocked
 }
 

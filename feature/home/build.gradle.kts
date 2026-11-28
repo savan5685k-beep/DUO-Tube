@@ -5,5 +5,6 @@ plugins {
 kotlin {
     sourceSets.commonMain.dependencies {
         implementation(projects.core.download)
+        implementation(projects.core.common)
     }
 }
