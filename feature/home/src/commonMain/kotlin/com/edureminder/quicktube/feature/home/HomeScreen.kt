@@ -289,6 +289,14 @@ private fun DiscoverTab(
                                 Text(url, maxLines = 1, overflow = TextOverflow.Ellipsis, style = MaterialTheme.typography.bodySmall,
                                     color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = .75f))
                             }
+                            // Dismiss only the copied-link suggestion; the clipboard and rest of screen remain unchanged.
+                            Box(
+                                Modifier.size(32.dp).clip(CircleShape)
+                                    .pressable(scaleDown = 0.88f, onClick = { clip = null }),
+                                contentAlignment = Alignment.Center,
+                            ) {
+                                Icon(QtIcons.Close, "Dismiss copied link", tint = MaterialTheme.colorScheme.onPrimaryContainer, modifier = Modifier.size(18.dp))
+                            }
                             // Its own button: the formats sheet for this link, right here (the card itself opens the page).
                             Box(
                                 Modifier.size(44.dp).clip(CircleShape).background(ex.brand)
