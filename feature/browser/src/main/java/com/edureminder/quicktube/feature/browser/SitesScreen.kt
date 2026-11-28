@@ -47,9 +47,9 @@ import org.koin.compose.viewmodel.koinViewModel
 import java.text.DateFormat
 import java.util.Date
 
-@Composable
 private val allowedBuiltInSites = setOf("YouTube", "YouTube Web", "Instagram", "Facebook")
 
+@Composable
 fun SiteIcon(name: String, url: String = name) {
     BrandTile(if (brandFor(name) != null) name else url, size = 46.dp, label = name)
 }
