@@ -77,7 +77,7 @@ import org.koin.compose.viewmodel.koinViewModel
 
 /** How a link of a bulk stands, with its download's progress folded in. */
 enum class LinkState(val label: String) {
-    WAITING("Waiting"), CHECKING("Checking link"), DOWNLOADING("Downloading"), DOWNLOADED("Downloaded"),
+    BLOCKED("Blocked"), WAITING("Waiting"), CHECKING("Checking link"), DOWNLOADING("Downloading"), DOWNLOADED("Downloaded"),
     SKIPPED("Already downloaded"), NOT_FOUND("Not found"), FAILED("Not downloaded"),
 }
 
@@ -114,6 +114,7 @@ class BulkViewModel(private val bulk: BulkDownloader, library: LibraryRepository
                 BulkStatus.CHECKING -> LinkState.CHECKING
                 BulkStatus.SKIPPED -> LinkState.SKIPPED
                 BulkStatus.NOT_FOUND -> LinkState.NOT_FOUND
+                BulkStatus.BLOCKED -> LinkState.BLOCKED
                 BulkStatus.FAILED -> LinkState.FAILED
                 BulkStatus.QUEUED -> when (task?.status) {
                     DownloadStatus.COMPLETED -> LinkState.DOWNLOADED
@@ -273,6 +274,7 @@ private fun stateColor(s: LinkState): Color = when (s) {
     LinkState.SKIPPED -> Color(0xFF3D7BE0)
     LinkState.NOT_FOUND -> Color(0xFFE08A00)
     LinkState.FAILED -> MaterialTheme.colorScheme.error
+    LinkState.BLOCKED -> MaterialTheme.colorScheme.tertiary
     else -> MaterialTheme.colorScheme.primary
 }
 
@@ -303,7 +305,7 @@ private fun BulkCard(v: BulkView, onClick: () -> Unit) {
 /** Coloured counts: "12 downloaded · 3 skipped · 1 not found". */
 @Composable
 private fun StatusCounts(v: BulkView, modifier: Modifier = Modifier, selected: LinkState? = null, onSelect: ((LinkState?) -> Unit)? = null) {
-    val shown = listOf(LinkState.DOWNLOADED, LinkState.DOWNLOADING, LinkState.CHECKING, LinkState.WAITING, LinkState.SKIPPED, LinkState.NOT_FOUND, LinkState.FAILED)
+    val shown = listOf(LinkState.DOWNLOADED, LinkState.DOWNLOADING, LinkState.CHECKING, LinkState.WAITING, LinkState.SKIPPED, LinkState.NOT_FOUND, LinkState.FAILED, LinkState.BLOCKED)
         .filter { v.count(it) > 0 }
     Row(modifier.horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
         shown.forEach { s ->
@@ -382,7 +384,7 @@ private fun LinkRow(r: BulkRow, onOpenLink: (String) -> Unit) {
                 Text(r.state.label + pct, style = MaterialTheme.typography.labelMedium, color = color, modifier = Modifier.padding(start = 6.dp))
                 Text(" · ${siteOf(r.item.link).second}", style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
             }
-            val why = r.item.message?.takeIf { r.state == LinkState.NOT_FOUND || r.state == LinkState.FAILED } ?: r.task?.error?.takeIf { r.state == LinkState.FAILED }
+            val why = r.item.message?.takeIf { r.state == LinkState.NOT_FOUND || r.state == LinkState.FAILED || r.state == LinkState.BLOCKED } ?: r.task?.error?.takeIf { r.state == LinkState.FAILED }
             if (why != null) Text(why, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant, maxLines = 2,
                 overflow = TextOverflow.Ellipsis, modifier = Modifier.padding(top = 2.dp))
             r.progress?.let { LinearProgressIndicator(progress = { it }, modifier = Modifier.fillMaxWidth().padding(top = 6.dp).height(4.dp).clip(CircleShape)) }

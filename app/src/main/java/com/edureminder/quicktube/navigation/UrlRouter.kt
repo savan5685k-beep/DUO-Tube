@@ -1,6 +1,7 @@
 package com.edureminder.quicktube.navigation
 
 import com.edureminder.quicktube.core.common.Urls
+import com.edureminder.quicktube.core.common.AdultContentFilter
 import com.edureminder.quicktube.core.data.MediaRepository
 import com.edureminder.quicktube.core.downloadsheet.DownloadSheetController
 import com.edureminder.quicktube.core.model.ItemKind
@@ -18,6 +19,7 @@ class UrlRouter(private val media: MediaRepository, private val sheet: DownloadS
      */
     fun routeForPasted(raw: String): Any {
         val url = Urls.normalize(raw)
+        if (AdultContentFilter.isBlockedUrlOrText(url)) return BrowserRoute(url, autoDownload = false)
         return when (val r = routeFor(url)) {
             is VideoRoute -> r.also { sheet.open(url) }
             is BrowserRoute -> r.copy(autoDownload = true)
@@ -28,6 +30,7 @@ class UrlRouter(private val media: MediaRepository, private val sheet: DownloadS
     fun routeFor(raw: String): Any {
         if (raw == "quicktube://status-saver") return StatusSaverRoute
         val url = Urls.normalize(raw)
+        if (AdultContentFilter.isBlockedUrlOrText(url)) return BrowserRoute(url)
         return when (media.linkKind(url)) {
             ItemKind.VIDEO -> VideoRoute(url)
             ItemKind.PLAYLIST -> PlaylistRoute(url)

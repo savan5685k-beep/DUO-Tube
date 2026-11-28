@@ -3,6 +3,7 @@ package com.edureminder.quicktube.core.downloadsheet
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.edureminder.quicktube.core.data.MediaRepository
+import com.edureminder.quicktube.core.common.AdultContentFilter
 import com.edureminder.quicktube.core.download.DownloadManager
 import com.edureminder.quicktube.core.extractor.StreamCandidate
 import com.edureminder.quicktube.core.extractor.StreamResolver
@@ -113,6 +114,9 @@ class DownloadSheetViewModel(
         loadedFor = target
         job?.cancel()
         when (target) {
+            is SheetTarget.Blocked -> _ui.value = SheetUi(
+                loading = false, error = AdultContentFilter.BLOCKED_MESSAGE, pageUrl = target.url,
+            )
             is SheetTarget.Direct -> _ui.value = SheetUi(
                 loading = false, title = target.title, thumbnail = target.thumbnail,
                 pageUrl = target.pageUrl, options = target.options, headers = target.headers, items = target.items,

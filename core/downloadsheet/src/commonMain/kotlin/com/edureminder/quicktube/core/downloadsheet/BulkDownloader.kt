@@ -3,6 +3,7 @@ package com.edureminder.quicktube.core.downloadsheet
 import com.edureminder.quicktube.core.analytics.Analytics
 import com.edureminder.quicktube.core.analytics.Events
 import com.edureminder.quicktube.core.common.Urls
+import com.edureminder.quicktube.core.common.AdultContentFilter
 import com.edureminder.quicktube.core.database.BulkDao
 import com.edureminder.quicktube.core.database.BulkItemEntity
 import com.edureminder.quicktube.core.database.BulkJobEntity
@@ -18,7 +19,7 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.launch
 
 /** What became of one link of a bulk download (stored as its name). */
-enum class BulkStatus { PENDING, CHECKING, QUEUED, SKIPPED, FAILED, NOT_FOUND }
+enum class BulkStatus { PENDING, CHECKING, QUEUED, SKIPPED, FAILED, NOT_FOUND, BLOCKED }
 
 data class BulkJob(val id: Long, val name: String, val folder: String, val createdAt: Long, val quality: BatchQuality, val items: List<BulkItem>)
 
@@ -78,9 +79,17 @@ class BulkDownloader(
     suspend fun start(name: String, urls: List<String>, quality: BatchQuality): Long {
         val title = name.trim().ifBlank { "Bulk " + java.text.SimpleDateFormat("yyyy-MM-dd HH.mm", java.util.Locale.US).format(java.util.Date()) }
         val jobId = dao.insertJob(BulkJobEntity(name = title, folder = Urls.safeFileName(title, 80), createdAt = System.currentTimeMillis(), quality = quality.name))
-        dao.insertItems(urls.mapIndexed { i, u -> BulkItemEntity(jobId = jobId, position = i, link = u, title = null, status = BulkStatus.PENDING.name, message = null, downloadId = 0) })
-        analytics.event(Events.DOWNLOAD_STARTED, mapOf("kind" to "bulk", "count" to urls.size, "quality" to quality.name.lowercase()))
-        dao.items(jobId).forEach { queue.send(it.id) }
+        dao.insertItems(urls.mapIndexed { i, u ->
+            val blocked = AdultContentFilter.isBlockedUrlOrText(u)
+            BulkItemEntity(
+                jobId = jobId, position = i, link = u, title = null,
+                status = if (blocked) BulkStatus.BLOCKED.name else BulkStatus.PENDING.name,
+                message = if (blocked) AdultContentFilter.BLOCKED_MESSAGE else null, downloadId = 0,
+            )
+        })
+        val allowedCount = urls.count { !AdultContentFilter.isBlockedUrlOrText(it) }
+        analytics.event(Events.DOWNLOAD_STARTED, mapOf("kind" to "bulk", "count" to allowedCount, "quality" to quality.name.lowercase()))
+        dao.items(jobId).filter { it.status == BulkStatus.PENDING.name }.forEach { queue.send(it.id) }
         return jobId
     }
 
@@ -99,6 +108,10 @@ class BulkDownloader(
     private suspend fun process(id: Long) {
         val item = dao.item(id)?.takeIf { it.status == BulkStatus.PENDING.name } ?: return
         val job = dao.job(item.jobId) ?: return
+        if (AdultContentFilter.isBlockedUrlOrText(item.link)) {
+            dao.updateItem(item.copy(status = BulkStatus.BLOCKED.name, message = AdultContentFilter.BLOCKED_MESSAGE, title = "Blocked by DUO Safe Browsing"))
+            return
+        }
         dao.updateItem(item.copy(status = BulkStatus.CHECKING.name))
         val found = links.resolve(item.link)
         val title = found.title.takeIf { it.isNotBlank() }

@@ -21,6 +21,7 @@ import androidx.compose.runtime.getValue
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.edureminder.quicktube.MainActivity
 import com.edureminder.quicktube.core.common.Urls
+import com.edureminder.quicktube.core.common.AdultContentFilter
 import com.edureminder.quicktube.core.data.SettingsRepository
 import com.edureminder.quicktube.ui.AppTheme
 import com.edureminder.quicktube.core.downloadsheet.DownloadSheetController
@@ -84,13 +85,25 @@ class ShareActivity : ComponentActivity() {
         // A shared list of links: bulk download, all of them into one folder.
         val all = text?.let(Urls::extractUrls).orEmpty()
         if (all.size > 1) {
-            startActivity(Intent(this, MainActivity::class.java).putExtra(MainActivity.EXTRA_BULK, all.joinToString("\n")).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK))
+            val safe = all.filterNot(AdultContentFilter::isBlockedUrlOrText)
+            if (safe.isEmpty()) {
+                Toast.makeText(this, AdultContentFilter.BLOCKED_MESSAGE, Toast.LENGTH_LONG).show()
+                finish()
+                return false
+            }
+            if (safe.size < all.size) Toast.makeText(this, "Some links were blocked by DUO Safe Browsing", Toast.LENGTH_SHORT).show()
+            startActivity(Intent(this, MainActivity::class.java).putExtra(MainActivity.EXTRA_BULK, safe.joinToString("\n")).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK))
             finish()
             return false
         }
         val url = Urls.extractUrl(text)
         if (url == null) {
             Toast.makeText(this, "No link found to download", Toast.LENGTH_SHORT).show()
+            finish()
+            return false
+        }
+        if (AdultContentFilter.isBlockedUrlOrText(url)) {
+            Toast.makeText(this, AdultContentFilter.BLOCKED_MESSAGE, Toast.LENGTH_LONG).show()
             finish()
             return false
         }

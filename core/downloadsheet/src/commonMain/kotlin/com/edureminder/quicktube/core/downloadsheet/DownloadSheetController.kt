@@ -1,6 +1,7 @@
 package com.edureminder.quicktube.core.downloadsheet
 
 import com.edureminder.quicktube.core.extractor.StreamCandidate
+import com.edureminder.quicktube.core.common.AdultContentFilter
 import com.edureminder.quicktube.core.model.DownloadOption
 import com.edureminder.quicktube.core.model.MediaItem
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -28,6 +29,8 @@ sealed interface SheetTarget {
     ) : SheetTarget
 
     /** Streams a web page loaded for the video being watched; resolved to the matching one(s) when the sheet opens. */
+    data class Blocked(val url: String) : SheetTarget
+
     data class Sniffed(
         val title: String,
         val pageUrl: String,
@@ -45,14 +48,34 @@ class DownloadSheetController {
     private val _target = MutableStateFlow<SheetTarget?>(null)
     val target: StateFlow<SheetTarget?> = _target
 
-    fun open(url: String, preview: MediaItem? = null) {
-        _target.value = SheetTarget.Page(url, preview)
-    }
+    fun open(url: String, preview: MediaItem? = null) = openDirect(SheetTarget.Page(url, preview))
 
     fun open(item: MediaItem) = open(item.url, item)
 
     fun openDirect(target: SheetTarget) {
-        _target.value = target
+        val safeTarget = when (target) {
+            is SheetTarget.Page -> if (AdultContentFilter.isBlockedUrlOrText(target.url)) SheetTarget.Blocked(target.url) else target
+            is SheetTarget.Direct -> {
+                val safeOptions = target.options.filterNot { option ->
+                    AdultContentFilter.isBlockedUrlOrText(option.url) ||
+                        option.audioUrl?.let(AdultContentFilter::isBlockedUrlOrText) == true ||
+                        option.images.any(AdultContentFilter::isBlockedUrlOrText)
+                }
+                if (target.pageUrl?.let(AdultContentFilter::isBlockedUrlOrText) == true ||
+                    target.options.isNotEmpty() && safeOptions.isEmpty()) {
+                    SheetTarget.Blocked(target.pageUrl ?: target.options.firstOrNull()?.url.orEmpty())
+                } else target.copy(options = safeOptions)
+            }
+            is SheetTarget.Sniffed -> {
+                val safeCandidates = target.candidates.filterNot { AdultContentFilter.isBlockedUrlOrText(it.url) }
+                if (AdultContentFilter.isBlockedUrlOrText(target.pageUrl) ||
+                    target.candidates.isNotEmpty() && safeCandidates.isEmpty()) {
+                    SheetTarget.Blocked(target.pageUrl)
+                } else target.copy(candidates = safeCandidates)
+            }
+            is SheetTarget.Blocked -> target
+        }
+        _target.value = safeTarget
     }
 
     fun dismiss() {

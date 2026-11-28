@@ -4,6 +4,7 @@ import android.Manifest
 import android.content.Intent
 import android.os.Build
 import android.os.Bundle
+import android.widget.Toast
 import android.graphics.Color
 import androidx.activity.ComponentActivity
 import androidx.activity.SystemBarStyle
@@ -42,6 +43,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.compose.rememberNavController
 import com.edureminder.quicktube.core.common.Permissions
 import com.edureminder.quicktube.core.common.Urls
+import com.edureminder.quicktube.core.common.AdultContentFilter
 import com.edureminder.quicktube.core.data.SettingsRepository
 import com.edureminder.quicktube.core.downloadsheet.DownloadSheetController
 import com.edureminder.quicktube.core.media.PlayerController
@@ -127,7 +129,21 @@ class MainActivity : ComponentActivity() {
 
     private fun handleIntent(intent: Intent, navigate: (Any) -> Unit) {
         // Several links shared at once (or "Bulk download" from a share): the bulk screen with them filled in.
-        intent.getStringExtra(EXTRA_BULK)?.let { navigate(com.edureminder.quicktube.core.navigation.BulkRoute(it)); return }
+        intent.getStringExtra(EXTRA_BULK)?.let { text ->
+            val links = Urls.extractUrls(text)
+            if (links.isEmpty()) {
+                navigate(com.edureminder.quicktube.core.navigation.BulkRoute(text))
+            } else {
+                val safe = links.filterNot(AdultContentFilter::isBlockedUrlOrText)
+                if (safe.isEmpty()) {
+                    Toast.makeText(this, AdultContentFilter.BLOCKED_MESSAGE, Toast.LENGTH_LONG).show()
+                } else {
+                    if (safe.size < links.size) Toast.makeText(this, "Some links were blocked by DUO Safe Browsing", Toast.LENGTH_SHORT).show()
+                    navigate(com.edureminder.quicktube.core.navigation.BulkRoute(safe.joinToString("\n")))
+                }
+            }
+            return
+        }
         intent.getStringExtra("open")?.let { open ->
             when {
                 open == "downloads" -> navigate(DownloadingRoute)
