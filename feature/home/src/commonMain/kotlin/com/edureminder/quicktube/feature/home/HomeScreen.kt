@@ -104,8 +104,6 @@ class HomeActions(
     val openSites: () -> Unit,
     val openLibrary: () -> Unit = {},
     val openVault: () -> Unit = {},
-    /** All our games (See all on the games row). */
-    val openGames: () -> Unit = {},
     val openBulk: () -> Unit = {},
     val openSubscriptions: () -> Unit = {},
     val openPlaylists: (music: Boolean) -> Unit = {},
@@ -201,9 +199,7 @@ private fun DiscoverTab(
     val ex = LocalQtExtras.current
     val sheet = koinInject<DownloadSheetController>()
     val feed by vm.feed.collectAsStateWithLifecycle()
-    val games by vm.games.collectAsStateWithLifecycle()
     val showTrending by vm.showTrending.collectAsStateWithLifecycle()
-    androidx.lifecycle.compose.LifecycleResumeEffect(Unit) { vm.refreshGames(); onPauseOrDispose { } }
     var clip by remember { mutableStateOf<String?>(null) }
     // Android 10+ only lets an app read the clipboard while its window has focus, which comes after
     // ON_RESUME, so read it whenever focus arrives (coming back from another app included).
@@ -306,11 +302,6 @@ private fun DiscoverTab(
             if (showTrending && (feed.items.isNotEmpty() || feed.loading)) item(key = "trending") {
                 DiscoverHeader("Recommended for you", QtIcons.TrendingUp, onSeeTrending)
                 TrendingCarousel(feed.items.take(12), loading = feed.items.isEmpty(), onOpen = actions.openItem, onDownload = onDownload)
-            }
-            // Our own games where the music row was (Remote Config; see docs/PROMO_GAMES.md).
-            if (games.games.isNotEmpty()) item(key = "games") {
-                DiscoverHeader(games.title, QtIcons.Apps, actions.openGames)
-                GamesRow(games.games)
             }
             item(key = "features") {
                 DiscoverHeader("Do more with QuickTube", QtIcons.Bolt, null)
