@@ -4,8 +4,8 @@ Updated: 2026-11-28
 
 ## Current main
 
-- SHA: 3e2c7688d7b4692589bd3dc9b13e164aed300c2c
-- Current main contains the latest branding, voice-search, privacy, security, search-suggestion, and download-flow changes. Concurrent commits are being checked against CI/APK runs.
+- SHA: a8872fc6ef0edac896414469bba33012fcc38a2d
+- Current main includes the branding, voice-search, privacy, security, search-suggestion, and download-flow changes plus a test fix for DUO metadata.
 
 ## Implemented
 
@@ -29,6 +29,8 @@ Updated: 2026-11-28
 - 7da1d049 — blocking at share, download-sheet, and bulk routes. APK build step passed; unit tests were still running when newer commits cancelled CI.
 - 68f7ebd5 — subscriptions/playlists UI changes; mirror succeeded, APK build was still in progress.
 - 3e2c7688 — tab-transition refinement; mirror succeeded, CI/APK were in progress.
+- b1f4a96b — latest main before this iteration: APK compile succeeded, but 2 desktop tests failed in `:core:download:desktopTest` (`AudioTagsTest.videoWithHeaderAtTheEndIsBrandedInPlace` and `mp3GetsTheBrandingFrames`). Log root cause: test assertions still hard-coded the legacy `edureminder.com` branding while implementation uses `Branding.URL` and `Branding.APP` for DUO.
+- a8872fc6 — updated AudioTags tests to assert against the shared DUO branding constants (`Branding.APP`, `Branding.URL`), rather than obsolete domain text. Tests/build are pending on this commit; no pass is claimed.
 - The latest APK artifact has not been verified or promoted as a QA download.
 
 ## Privacy and security audit
