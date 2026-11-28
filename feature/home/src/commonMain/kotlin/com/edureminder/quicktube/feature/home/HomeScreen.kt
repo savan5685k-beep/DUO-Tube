@@ -316,16 +316,16 @@ private fun DiscoverTab(
                 DiscoverHeader("DUO tools", QtIcons.Bolt, null)
                 EqualHeightGrid(Modifier.padding(horizontal = 16.dp), columns = if (wideTiles) 3 else 2) {
                     FeatureTile("Bulk download", "Hundreds of links or a .txt file", QtIcons.Checklist, Color(0xFFFF8A3D), Modifier, actions.openBulk)
-                    // Sharing from other apps, the in-app browser, the vault and WhatsApp statuses are phone features.
+                    FeatureTile("Subscriptions", "Channels you follow and new videos", QtIcons.Notifications, Color(0xFF2FCB7A), Modifier, actions.openSubscriptions)
+                    FeatureTile("Video playlists", "Create and manage video lists", QtIcons.PlaylistAdd, Color(0xFF4C8DFF), Modifier) { actions.openPlaylists(false) }
+                    FeatureTile("Music playlists", "Organize your music collections", QtIcons.LibraryMusic, Color(0xFF9B6BFF), Modifier) { actions.openPlaylists(true) }
                     if (isMobilePlatform) {
-                        FeatureTile("Share to download", "From YouTube, Instagram and Facebook", QtIcons.Share, Color(0xFF2FCB7A), Modifier) { actions.openHowTo("YOUTUBE") }
                         FeatureTile("Browser", "Open a link in the in-app browser", QtIcons.Public, Color(0xFF4C8DFF), Modifier, actions.openSites)
                         FeatureTile("Private vault", "Hide files behind a PIN", QtIcons.Lock, Color(0xFFFF5C93), Modifier, actions.openVault)
-                        FeatureTile("WhatsApp status", "Save statuses you've viewed", QtIcons.Downloading, Color(0xFF25D366), Modifier) { actions.openHowTo("WHATSAPP") }
-                        FeatureTile("Watch history", "Pick up where you left off", QtIcons.History, Color(0xFF9B6BFF), Modifier, actions.openWatchHistory)
+                        FeatureTile("Watch history", "Pick up where you left off", QtIcons.History, Color(0xFFFF8A3D), Modifier, actions.openWatchHistory)
                     } else {
-                        FeatureTile("Paste any link", "1800+ sites: copy a video's link, paste it here", QtIcons.ContentPaste, Color(0xFF4C8DFF), Modifier, actions.openSites)
-                        FeatureTile("Music to MP3", "Search the Music tab, pick MP3 or FLAC", QtIcons.LibraryMusic, Color(0xFF9B6BFF), Modifier) { actions.openSearch("") }
+                        FeatureTile("Paste any link", "Supported sites and media links", QtIcons.ContentPaste, Color(0xFF4C8DFF), Modifier, actions.openSites)
+                        FeatureTile("Music to MP3", "Search music and save audio", QtIcons.LibraryMusic, Color(0xFF9B6BFF), Modifier) { actions.openSearch("") }
                     }
                 }
             }
