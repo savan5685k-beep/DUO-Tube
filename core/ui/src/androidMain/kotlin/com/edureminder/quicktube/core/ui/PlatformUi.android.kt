@@ -4,6 +4,8 @@ import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import kotlinx.coroutines.launch
 import androidx.compose.ui.platform.LocalContext
@@ -47,6 +49,21 @@ actual fun rememberClipboardReader(): () -> String? {
             }.getOrNull()
         }
     }
+}
+
+
+
+@Composable
+actual fun rememberClipboardRevision(): Int {
+    val context = LocalContext.current
+    val clipboard = remember(context) { context.getSystemService(android.content.ClipboardManager::class.java) }
+    val revision = remember(clipboard) { mutableStateOf(0) }
+    DisposableEffect(clipboard) {
+        val listener = android.content.ClipboardManager.OnPrimaryClipChangedListener { revision.value += 1 }
+        clipboard.addPrimaryClipChangedListener(listener)
+        onDispose { clipboard.removePrimaryClipChangedListener(listener) }
+    }
+    return revision.value
 }
 
 @Composable
